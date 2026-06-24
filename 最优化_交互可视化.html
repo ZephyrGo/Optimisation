@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>最优化可视化理解 · 交互版</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#ffffff; --ink:#1f2933; --muted:#677;
+    --accent:#2563eb; --red:#e11d48; --green:#059669; --gray:#94a3b8;
+    --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+       background:var(--bg);color:var(--ink);line-height:1.6;}
+  header{background:#0f172a;color:#fff;padding:18px 24px;}
+  header h1{margin:0;font-size:20px;}
+  header p{margin:4px 0 0;font-size:13px;color:#94a3b8;}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 24px;background:#1e293b;}
+  .tabs button{background:#334155;color:#cbd5e1;border:none;padding:8px 14px;
+       border-radius:6px;cursor:pointer;font-size:14px;transition:.15s;}
+  .tabs button:hover{background:#475569;color:#fff;}
+  .tabs button.active{background:var(--accent);color:#fff;}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+        padding:20px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+  .card h2{margin:0 0 4px;font-size:18px;}
+  .tag{display:inline-block;background:#eff6ff;color:var(--accent);font-size:12px;
+       padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+  .layout{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;}
+  .layout canvas{background:#fcfdff;border:1px solid var(--line);border-radius:8px;
+       cursor:crosshair;}
+  .controls{flex:1;min-width:240px;}
+  .ctl{margin-bottom:14px;}
+  .ctl label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px;}
+  .ctl input[type=range]{width:100%;}
+  .ctl .val{font-weight:600;color:var(--ink);}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .btnrow button{background:var(--accent);color:#fff;border:none;padding:8px 14px;
+       border-radius:6px;cursor:pointer;font-size:13px;}
+  .btnrow button.ghost{background:#e2e8f0;color:#334155;}
+  .btnrow button:hover{filter:brightness(1.08);}
+  select{padding:6px 10px;border:1px solid var(--line);border-radius:6px;font-size:14px;}
+  .readout{background:#0f172a;color:#e2e8f0;font-family:"Consolas",monospace;
+       font-size:13px;padding:12px 14px;border-radius:8px;white-space:pre-wrap;
+       margin-top:10px;min-height:60px;}
+  .note{font-size:13px;color:var(--muted);background:#fafbfc;border-left:3px solid var(--accent);
+       padding:10px 14px;border-radius:0 6px 6px 0;margin-top:14px;}
+  .status{font-weight:700;font-size:15px;margin-top:8px;}
+  .ok{color:var(--green);} .bad{color:var(--red);} .warn{color:#d97706;}
+  code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:13px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>最优化可视化理解 · 交互版</h1>
+  <p>拖动参数 / 点击运行，直观感受考试重点算法。对应模拟题二~五 + 核心算法直觉。</p>
+</header>
+
+<div class="tabs">
+  <button data-tab="m1" class="active">① 步长与收敛(1D)</button>
+  <button data-tab="m2">② 下降算法对比(2D)★</button>
+  <button data-tab="m3">③ KKT相切几何★</button>
+  <button data-tab="m4">④ 增广拉格朗日ALM★</button>
+  <button data-tab="m5">⑤ 驻点/鞍点</button>
+</div>
+
+<div class="wrap">
+
+<!-- ===== 模块1 ===== -->
+<div class="panel active" id="m1">
+  <div class="card">
+    <h2>① 固定步长梯度下降的收敛性 <span class="tag">模拟题三-1</span></h2>
+    <p style="font-size:14px;color:var(--muted)">目标 f(x)=½x²，迭代 x<sub>k+1</sub>=(1−α)x<sub>k</sub>。拖动步长 α，看序列怎么变。</p>
+    <div class="layout">
+      <canvas id="c1" width="520" height="320"></canvas>
+      <div class="controls">
+        <div class="ctl">
+          <label>步长 α = <span class="val" id="a1v">0.50</span></label>
+          <input type="range" id="a1" min="0" max="2.6" step="0.01" value="0.5">
+        </div>
+        <div class="ctl">
+          <label>初始点 x₀ = <span class="val" id="x01v">8</span></label>
+          <input type="range" id="x01" min="-10" max="10" step="0.5" value="8">
+        </div>
+        <div class="status" id="s1"></div>
+        <div class="note">
+          收敛 ⟺ |1−α|&lt;1 ⟺ <b>0&lt;α&lt;2</b>；<br>
+          α=1 收缩因子为0 → <b>一步到底</b>（最快，=1/L）；<br>
+          α=2 → 因子−1 → 两点震荡；α&gt;2 → 发散。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 模块2 ===== -->
+<div class="panel" id="m2">
+  <div class="card">
+    <h2>② 下降算法对比 + 条件数 + 锯齿 <span class="tag">模拟题三 / 笔记08-09</span></h2>
+    <p style="font-size:14px;color:var(--muted)">二次型 f=½(λ₁x²+λ₂y²)。在画布上<b>点击设起点</b>，选算法后点"运行"，看迭代路径在椭圆等高线上的走法。</p>
+    <div class="layout">
+      <canvas id="c2" width="460" height="460"></canvas>
+      <div class="controls">
+        <div class="ctl">
+          <label>λ₁ (x方向曲率) = <span class="val" id="l1v">10</span></label>
+          <input type="range" id="l1" min="1" max="20" step="0.5" value="10">
+        </div>
+        <div class="ctl">
+          <label>λ₂ (y方向曲率) = <span class="val" id="l2v">1</span></label>
+          <input type="range" id="l2" min="1" max="20" step="0.5" value="1">
+        </div>
+        <div class="ctl">
+          <label>算法</label>
+          <select id="alg2">
+            <option value="fixed">固定步长梯度下降</option>
+            <option value="exact">最速下降(精确步长)</option>
+            <option value="newton">牛顿法</option>
+          </select>
+        </div>
+        <div class="ctl" id="alphaBox">
+          <label>固定步长 α = <span class="val" id="a2v">0.10</span></label>
+          <input type="range" id="a2" min="0.01" max="0.30" step="0.01" value="0.1">
+        </div>
+        <div class="btnrow">
+          <button id="run2">▶ 运行</button>
+          <button id="reset2" class="ghost">重置起点</button>
+        </div>
+        <div class="readout" id="r2">点击画布设置起点…</div>
+        <div class="note">条件数 κ=λ₁/λ₂。κ越大椭圆越扁，梯度法<b>锯齿</b>越狠越慢；牛顿法用Hessian把椭圆"掰圆"，<b>一步直达</b>。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 模块3 ===== -->
+<div class="panel" id="m3">
+  <div class="card">
+    <h2>③ KKT / 拉格朗日"相切+梯度共线" <span class="tag">模拟题四</span></h2>
+    <p style="font-size:14px;color:var(--muted)">min f=x₁x₂ s.t. x₁²+x₂²=1。拖动 θ 让点 P 沿约束圆走，观察 ∇f(蓝) 与 ∇c(红) 何时<b>共线</b>——那就是 KKT 点。</p>
+    <div class="layout">
+      <canvas id="c3" width="460" height="460"></canvas>
+      <div class="controls">
+        <div class="ctl">
+          <label>角度 θ = <span class="val" id="t3v">30</span>°</label>
+          <input type="range" id="t3" min="0" max="360" step="1" value="30">
+        </div>
+        <div class="status" id="s3"></div>
+        <div class="readout" id="r3"></div>
+        <div class="note">共线条件 ∇f=λ∇c。本例 KKT 点在 θ=45°,135°,225°,315°：<br>
+          f=−½（min，θ=135°/315°）或 f=+½（max，θ=45°/225°）。<br>
+          灰双曲线是目标 x₁x₂ 的等高线，相切处即最优。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 模块4 ===== -->
+<div class="panel" id="m4">
+  <div class="card">
+    <h2>④ 增广拉格朗日法 ALM 收敛 <span class="tag">模拟题五</span></h2>
+    <p style="font-size:14px;color:var(--muted)">min x²+y² s.t. x+y−2=0，σ=1。点"下一步"看乘子 λ 递推 0→−2、迭代点逼近真解 (1,1)。</p>
+    <div class="layout">
+      <canvas id="c4" width="460" height="460"></canvas>
+      <div class="controls">
+        <div class="btnrow">
+          <button id="step4">▶ 下一步迭代</button>
+          <button id="auto4">⏩ 自动跑</button>
+          <button id="reset4" class="ghost">重置</button>
+        </div>
+        <div class="readout" id="r4"></div>
+        <div class="note">
+          子问题极小：x=y=(2−λ)/4；<br>
+          乘子递推：λ<sub>k+1</sub>=λ<sub>k</sub>+σ·c = ½λ<sub>k</sub>−1 → 极限 <b>λ*=−2</b>；<br>
+          代回 x=y=1。<b>σ固定=1</b>（不必→∞），靠更新乘子精确收敛。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 模块5 ===== -->
+<div class="panel" id="m5">
+  <div class="card">
+    <h2>⑤ 驻点类型：极小 / 极大 / 鞍点 <span class="tag">模拟题二 / 笔记04</span></h2>
+    <p style="font-size:14px;color:var(--muted)">热力图（蓝=低，红=高）。切换函数，观察驻点(★)处的形态。∇f=0 处看 Hessian 定号判类型。</p>
+    <div class="layout">
+      <canvas id="c5" width="460" height="460"></canvas>
+      <div class="controls">
+        <div class="ctl">
+          <label>函数</label>
+          <select id="fn5">
+            <option value="min">f=x²+y²（碗 → 极小，Hessian正定）</option>
+            <option value="max">f=−(x²+y²)（倒碗 → 极大，负定）</option>
+            <option value="saddle">f=x²−y²（马鞍 → 鞍点，不定）</option>
+            <option value="exam">f=x⁴−2x²+y²（模拟题二切片，双井+鞍）</option>
+          </select>
+        </div>
+        <div class="readout" id="r5"></div>
+        <div class="note">判定：∇f=0 求驻点 → Hessian 正定=极小 / 负定=极大 / 不定=鞍点。<br>
+          模拟题二函数有 3 个驻点：(0,0)鞍点，(±1,0)严格全局极小(f=−1)。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p style="text-align:center;color:var(--muted);font-size:12px;margin-top:30px">
+  最优化可视化理解 · 单文件交互版 ｜ 配合《详细笔记》《考试速查6页》使用
+</p>
+</div>
+
+<script>
+/* ========== 通用工具 ========== */
+function mapper(cv, xmin, xmax, ymin, ymax){
+  const w=cv.width, h=cv.height;
+  return {
+    sx:x=> (x-xmin)/(xmax-xmin)*w,
+    sy:y=> h-(y-ymin)/(ymax-ymin)*h,
+    ix:px=> xmin+px/w*(xmax-xmin),
+    iy:py=> ymin+(h-py)/h*(ymax-ymin),
+    w,h,xmin,xmax,ymin,ymax
+  };
+}
+function axes(ctx,m){
+  ctx.strokeStyle="#cbd5e1"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(m.sx(m.xmin),m.sy(0)); ctx.lineTo(m.sx(m.xmax),m.sy(0));
+  ctx.moveTo(m.sx(0),m.sy(m.ymin)); ctx.lineTo(m.sx(0),m.sy(m.ymax)); ctx.stroke();
+}
+function dot(ctx,m,x,y,r,color){
+  ctx.fillStyle=color; ctx.beginPath(); ctx.arc(m.sx(x),m.sy(y),r,0,7); ctx.fill();
+}
+function arrow(ctx,m,x0,y0,x1,y1,color,wid){
+  const X0=m.sx(x0),Y0=m.sy(y0),X1=m.sx(x1),Y1=m.sy(y1);
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=wid||2.5;
+  ctx.beginPath(); ctx.moveTo(X0,Y0); ctx.lineTo(X1,Y1); ctx.stroke();
+  const ang=Math.atan2(Y1-Y0,X1-X0), s=8;
+  ctx.beginPath(); ctx.moveTo(X1,Y1);
+  ctx.lineTo(X1-s*Math.cos(ang-0.4),Y1-s*Math.sin(ang-0.4));
+  ctx.lineTo(X1-s*Math.cos(ang+0.4),Y1-s*Math.sin(ang+0.4));
+  ctx.closePath(); ctx.fill();
+}
+
+/* ========== Tab 切换 ========== */
+document.querySelectorAll('.tabs button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.tab).classList.add('active');
+  };
+});
+
+/* ========== 模块1：1D 收敛 ========== */
+(function(){
+  const cv=document.getElementById('c1'), ctx=cv.getContext('2d');
+  const aS=document.getElementById('a1'), xS=document.getElementById('x01');
+  function draw(){
+    const a=+aS.value, x0=+xS.value;
+    document.getElementById('a1v').textContent=a.toFixed(2);
+    document.getElementById('x01v').textContent=x0;
+    const N=15, xs=[]; let x=x0;
+    for(let k=0;k<=N;k++){xs.push(x); x=x*(1-a);}
+    // 自适应纵轴
+    let mx=Math.max(1,...xs.map(Math.abs)); mx=Math.min(mx,40);
+    const m=mapper(cv,-0.5,N+0.5,-mx*1.1,mx*1.1);
+    ctx.clearRect(0,0,cv.width,cv.height);
+    axes(ctx,m);
+    // 折线
+    ctx.strokeStyle="#2563eb"; ctx.lineWidth=2; ctx.beginPath();
+    xs.forEach((v,k)=>{const X=m.sx(k),Y=m.sy(Math.max(-mx*1.1,Math.min(mx*1.1,v)));k?ctx.lineTo(X,Y):ctx.moveTo(X,Y);});
+    ctx.stroke();
+    xs.forEach((v,k)=>dot(ctx,m,k,Math.max(-mx*1.1,Math.min(mx*1.1,v)),3.5,"#1e3a8a"));
+    // 状态判定
+    const f=Math.abs(1-a); const s=document.getElementById('s1');
+    if(a===1){s.className="status ok";s.textContent="α=1：一步到底，最快（x₁=0）";}
+    else if(f<1){s.className="status ok";s.textContent="收敛 ✓ （|1−α|="+f.toFixed(2)+"<1）";}
+    else if(f===1){s.className="status warn";s.textContent="震荡（α=2，在 ±x₀ 跳）";}
+    else{s.className="status bad";s.textContent="发散 ✗ （|1−α|="+f.toFixed(2)+">1）";}
+  }
+  aS.oninput=draw; xS.oninput=draw; draw();
+})();
+
+/* ========== 模块2：2D 下降算法 ========== */
+(function(){
+  const cv=document.getElementById('c2'), ctx=cv.getContext('2d');
+  const R=6; const m=mapper(cv,-R,R,-R,R);
+  let start=null, path=[], timer=null;
+  const l1S=document.getElementById('l1'),l2S=document.getElementById('l2'),
+        a2S=document.getElementById('a2'),alg=document.getElementById('alg2');
+  function params(){return {a:+l1S.value,b:+l2S.value,al:+a2S.value,mode:alg.value};}
+  function drawBG(){
+    const {a,b}=params();
+    ctx.clearRect(0,0,cv.width,cv.height); axes(ctx,m);
+    // 椭圆等高线 a x² + b y² = 2c
+    ctx.strokeStyle="#cdd6e3"; ctx.lineWidth=1;
+    for(let c=1;c<=8;c++){
+      const lvl=c*c*0.5;
+      const A=Math.sqrt(2*lvl/a), B=Math.sqrt(2*lvl/b);
+      ctx.beginPath();
+      for(let t=0;t<=6.30;t+=0.05){const X=m.sx(A*Math.cos(t)),Y=m.sy(B*Math.sin(t));t?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
+      ctx.closePath(); ctx.stroke();
+    }
+    dot(ctx,m,0,0,5,"#e11d48"); // 最优点
+  }
+  function drawPath(){
+    drawBG();
+    if(path.length){
+      ctx.strokeStyle=params().mode==='newton'?"#059669":"#2563eb";
+      ctx.lineWidth=2; ctx.beginPath();
+      path.forEach((p,i)=>{const X=m.sx(p[0]),Y=m.sy(p[1]);i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);});
+      ctx.stroke();
+      path.forEach(p=>dot(ctx,m,p[0],p[1],3,"#1e3a8a"));
+      dot(ctx,m,path[0][0],path[0][1],4,"#d97706");
+    }
+  }
+  function step(){
+    const {a,b,al,mode}=params();
+    let [x,y]=path[path.length-1];
+    const gx=a*x, gy=b*y;
+    if(Math.hypot(gx,gy)<1e-4){stop("收敛 ✓");return false;}
+    let nx,ny;
+    if(mode==='fixed'){nx=x-al*gx; ny=y-al*gy;}
+    else if(mode==='exact'){
+      const gg=gx*gx+gy*gy, gAg=a*a*a*x*x+b*b*b*y*y;
+      const s=gg/gAg; nx=x-s*gx; ny=y-s*gy;
+    } else { // newton: x_new=0 一步
+      nx=0; ny=0;
+    }
+    if(Math.hypot(nx,ny)>1e3){stop("发散 ✗（步长太大）");return false;}
+    path.push([nx,ny]);
+    document.getElementById('r2').textContent=
+      `κ=λ₁/λ₂=${(Math.max(a,b)/Math.min(a,b)).toFixed(1)}  步数=${path.length-1}\n`+
+      `当前点=(${nx.toFixed(3)}, ${ny.toFixed(3)})  f=${(0.5*(a*nx*nx+b*ny*ny)).toExponential(2)}`;
+    return true;
+  }
+  function stop(msg){clearInterval(timer);timer=null;
+    document.getElementById('r2').textContent+= "\n"+msg;}
+  function run(){
+    if(!start){document.getElementById('r2').textContent="请先点击画布设置起点！";return;}
+    clearInterval(timer); path=[start.slice()];
+    timer=setInterval(()=>{ if(!step()){clearInterval(timer);timer=null;} drawPath();
+      if(path.length>200){stop("已达200步");}},250);
+  }
+  cv.onclick=e=>{const r=cv.getBoundingClientRect();
+    start=[m.ix(e.clientX-r.left),m.iy(e.clientY-r.top)]; path=[start.slice()];
+    document.getElementById('r2').textContent=`起点=(${start[0].toFixed(2)}, ${start[1].toFixed(2)})，点"运行"`;
+    drawPath();};
+  document.getElementById('run2').onclick=run;
+  document.getElementById('reset2').onclick=()=>{start=null;path=[];clearInterval(timer);drawBG();
+    document.getElementById('r2').textContent="点击画布设置起点…";};
+  [l1S,l2S,a2S].forEach(s=>s.oninput=()=>{
+    document.getElementById('l1v').textContent=(+l1S.value).toFixed(0);
+    document.getElementById('l2v').textContent=(+l2S.value).toFixed(0);
+    document.getElementById('a2v').textContent=(+a2S.value).toFixed(2);
+    drawPath();});
+  alg.onchange=()=>{document.getElementById('alphaBox').style.display=
+      alg.value==='fixed'?'block':'none'; drawPath();};
+  drawBG();
+})();
+
+/* ========== 模块3：KKT 相切 ========== */
+(function(){
+  const cv=document.getElementById('c3'), ctx=cv.getContext('2d');
+  const m=mapper(cv,-1.6,1.6,-1.6,1.6);
+  const tS=document.getElementById('t3');
+  function draw(){
+    const th=(+tS.value)*Math.PI/180;
+    document.getElementById('t3v').textContent=tS.value;
+    ctx.clearRect(0,0,cv.width,cv.height); axes(ctx,m);
+    // 目标 x1x2 = c 的等高线（双曲线）
+    ctx.strokeStyle="#dbe2ec"; ctx.lineWidth=1;
+    [0.1,0.25,0.45,-0.1,-0.25,-0.45].forEach(c=>{
+      ctx.beginPath(); let first=true;
+      for(let x=-1.55;x<=1.55;x+=0.03){ if(Math.abs(x)<0.06)continue;
+        const y=c/x; if(Math.abs(y)>1.6){first=true;continue;}
+        const X=m.sx(x),Y=m.sy(y); first?(ctx.moveTo(X,Y),first=false):ctx.lineTo(X,Y);}
+      ctx.stroke();
+    });
+    // 约束圆
+    ctx.strokeStyle="#64748b"; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.arc(m.sx(0),m.sy(0),m.sx(1)-m.sx(0),0,7); ctx.stroke();
+    // 点 P
+    const x=Math.cos(th), y=Math.sin(th);
+    // 梯度箭头（归一化×0.5）
+    let fgx=y,fgy=x; const fn=Math.hypot(fgx,fgy)||1; // ∇f=(x2,x1)
+    let cgx=2*x,cgy=2*y; const cn=Math.hypot(cgx,cgy)||1; // ∇c=(2x1,2x2)
+    arrow(ctx,m,x,y,x+0.5*cgx/cn,y+0.5*cgy/cn,"#e11d48",2.5); // ∇c 红
+    arrow(ctx,m,x,y,x+0.5*fgx/fn,y+0.5*fgy/fn,"#2563eb",2.5); // ∇f 蓝
+    dot(ctx,m,x,y,5,"#0f172a");
+    // 共线判定 cross of ∇f,∇c
+    const cross=fgx*cgy-fgy*cgx; // = y*2y - x*2x = 2(y²-x²) = -2cos2θ
+    const f=x*y; const s=document.getElementById('s3');
+    document.getElementById('r3').textContent=
+      `P=(${x.toFixed(3)}, ${y.toFixed(3)})\n∇f=(${fgx.toFixed(2)},${fgy.toFixed(2)})  ∇c=(${cgx.toFixed(2)},${cgy.toFixed(2)})\nf=x₁x₂=${f.toFixed(3)}`;
+    if(Math.abs(cross)<0.05){
+      const kind=f<0?"最小值 (f=−½)":"最大值 (f=+½)";
+      s.className="status ok"; s.textContent=`✓ ∇f∥∇c → KKT点！${kind}`;
+    }else{s.className="status warn"; s.textContent="✗ ∇f 与 ∇c 不共线（非驻点）";}
+  }
+  tS.oninput=draw; draw();
+})();
+
+/* ========== 模块4：ALM ========== */
+(function(){
+  const cv=document.getElementById('c4'), ctx=cv.getContext('2d');
+  const m=mapper(cv,-0.5,2.5,-0.5,2.5);
+  let lam=0, hist=[], timer=null;
+  function pt(l){const v=(2-l)/4; return [v,v];}
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height); axes(ctx,m);
+    // 约束直线 x+y=2
+    ctx.strokeStyle="#64748b"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(m.sx(0),m.sy(2)); ctx.lineTo(m.sx(2),m.sy(0)); ctx.stroke();
+    // 目标等高线 x²+y²=r²（圆）
+    ctx.strokeStyle="#e2e8f0"; ctx.lineWidth=1;
+    [0.5,1,1.5,2].forEach(r=>{ctx.beginPath();
+      ctx.arc(m.sx(0),m.sy(0),m.sx(r)-m.sx(0),0,7);ctx.stroke();});
+    // 真解 (1,1)
+    dot(ctx,m,1,1,6,"#e11d48");
+    // 迭代点轨迹
+    ctx.strokeStyle="#2563eb"; ctx.lineWidth=1.5; ctx.beginPath();
+    hist.forEach((l,i)=>{const[a,b]=pt(l);const X=m.sx(a),Y=m.sy(b);i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);});
+    ctx.stroke();
+    hist.forEach(l=>{const[a,b]=pt(l);dot(ctx,m,a,b,3.5,"#1e3a8a");});
+    const [cx,cy]=pt(lam); dot(ctx,m,cx,cy,5,"#059669");
+    const c=cx+cy-2;
+    document.getElementById('r4').textContent=
+      `k=${hist.length-1}\nλ=${lam.toFixed(4)}   →  极限 −2\n(x,y)=(${cx.toFixed(4)}, ${cy.toFixed(4)})\n约束违反 c=x+y−2=${c.toFixed(4)}`;
+  }
+  function step(){lam=lam/2-1; hist.push(lam); draw();}
+  function reset(){clearInterval(timer);timer=null;lam=0;hist=[0];draw();}
+  document.getElementById('step4').onclick=step;
+  document.getElementById('reset4').onclick=reset;
+  document.getElementById('auto4').onclick=()=>{
+    clearInterval(timer);
+    timer=setInterval(()=>{if(Math.abs(lam+2)<1e-4||hist.length>25){clearInterval(timer);return;}step();},400);
+  };
+  reset();
+})();
+
+/* ========== 模块5：驻点热力图 ========== */
+(function(){
+  const cv=document.getElementById('c5'), ctx=cv.getContext('2d');
+  const R=2.2; const m=mapper(cv,-R,R,-R,R);
+  const sel=document.getElementById('fn5');
+  function f(type,x,y){
+    if(type==='min')return x*x+y*y;
+    if(type==='max')return -(x*x+y*y);
+    if(type==='saddle')return x*x-y*y;
+    return x*x*x*x-2*x*x+y*y; // exam
+  }
+  function crit(type){
+    if(type==='exam')return [[0,0,'鞍点'],[1,0,'极小'],[-1,0,'极小']];
+    return [[0,0, type==='min'?'极小':type==='max'?'极大':'鞍点']];
+  }
+  function color(v,lo,hi){
+    const t=Math.max(0,Math.min(1,(v-lo)/(hi-lo)));
+    // 蓝→白→红
+    const r=Math.round(255*Math.min(1,2*t)), b=Math.round(255*Math.min(1,2*(1-t)));
+    const g=Math.round(255*(1-Math.abs(t-0.5)*2)*0.6+90);
+    return `rgb(${r},${g},${b})`;
+  }
+  function draw(){
+    const type=sel.value;
+    // 采样定范围
+    let lo=1e9,hi=-1e9; const vals=[];
+    const step=4;
+    for(let py=0;py<cv.height;py+=step){const row=[];
+      for(let px=0;px<cv.width;px+=step){
+        const v=f(type,m.ix(px),m.iy(py)); row.push(v);
+        if(v<lo)lo=v; if(v>hi)hi=v;} vals.push(row);}
+    for(let i=0,py=0;py<cv.height;py+=step,i++)
+      for(let j=0,px=0;px<cv.width;px+=step,j++){
+        ctx.fillStyle=color(vals[i][j],lo,hi); ctx.fillRect(px,py,step,step);}
+    axes(ctx,m);
+    // 等高线（简单：几条 level 用 marching 太重，画驻点星）
+    crit(type).forEach(([x,y,lab])=>{
+      ctx.fillStyle="#fff"; ctx.strokeStyle="#0f172a"; ctx.lineWidth=2;
+      const X=m.sx(x),Y=m.sy(y);
+      // 画★
+      ctx.beginPath();
+      for(let k=0;k<5;k++){const a=-Math.PI/2+k*4*Math.PI/5;
+        const X2=X+9*Math.cos(a),Y2=Y+9*Math.sin(a); k?ctx.lineTo(X2,Y2):ctx.moveTo(X2,Y2);}
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle="#0f172a"; ctx.font="12px sans-serif";
+      ctx.fillText(lab+`(${x},${y})`,X+12,Y-6);
+    });
+    const txt={min:"碗形：唯一全局极小，Hessian 处处正定。",
+      max:"倒碗：唯一极大，Hessian 负定（求min则无下界）。",
+      saddle:"马鞍：(0,0)处一方向降一方向升 → 鞍点，Hessian 不定。",
+      exam:"模拟题二切片：双井 → (±1,0)严格全局极小(f=−1)，(0,0)鞍点。"}[type];
+    document.getElementById('r5').textContent=txt+`\n值域≈[${lo.toFixed(2)}, ${hi.toFixed(2)}]  蓝=低 红=高`;
+  }
+  sel.onchange=draw; draw();
+})();
+</script>
+</body>
+</html>
