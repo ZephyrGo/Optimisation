@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>最优化理论 · 期末复习手册</title>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#FAF8F3; --panel:#FFFFFF; --ink:#23272E; --muted:#5C6470;
+    --primary:#1B4965; --primary-2:#2C6E91; --rule:#E5DFD3;
+    --ex-bg:#FCF6E8; --ex-bd:#E2C988; --ex-lb:#8E711B;
+    --tip-bg:#ECF5EF; --tip-bd:#A8CEB5; --tip-lb:#2F6B43;
+    --warn-bg:#FBEDE8; --warn-bd:#E4B6A5; --warn-lb:#A0492B;
+    --chip:#EEF2F4;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",system-ui,sans-serif;
+    line-height:1.75; font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:0 22px;
+    display:grid; grid-template-columns:248px 1fr; gap:38px;}
+  /* ---------- sidebar nav ---------- */
+  nav.toc{
+    position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+    padding:26px 6px 40px 0; border-right:1px solid var(--rule);
+  }
+  nav.toc .brand{font-weight:700; font-size:15px; color:var(--primary);
+    letter-spacing:.06em; margin-bottom:4px;}
+  nav.toc .sub{font-size:12px; color:var(--muted); margin-bottom:18px;}
+  nav.toc a{display:block; text-decoration:none; color:var(--muted);
+    font-size:13.5px; padding:5px 10px; border-radius:7px; line-height:1.4;}
+  nav.toc a:hover{background:var(--chip); color:var(--primary);}
+  nav.toc a.grp{color:var(--ink); font-weight:600; margin-top:12px; font-size:13px;}
+  /* ---------- main ---------- */
+  main{padding:30px 0 90px; min-width:0;}
+  header.hero{
+    background:linear-gradient(135deg,#13384f 0%,#1B4965 55%,#2C6E91 100%);
+    color:#fff; border-radius:16px; padding:34px 34px 30px; margin-bottom:34px;
+    box-shadow:0 10px 30px rgba(19,56,79,.18);
+  }
+  header.hero h1{margin:0 0 8px; font-size:29px; letter-spacing:.01em;}
+  header.hero p{margin:0; color:#cfe2ec; font-size:14.5px; max-width:640px;}
+  header.hero .tags{margin-top:16px; display:flex; flex-wrap:wrap; gap:8px;}
+  header.hero .tags span{background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22);
+    padding:3px 11px; border-radius:999px; font-size:12px;}
+  section{scroll-margin-top:14px; margin-bottom:30px;}
+  h2{color:var(--primary); font-size:22px; margin:34px 0 14px;
+    padding-bottom:9px; border-bottom:2px solid var(--rule); display:flex; align-items:baseline; gap:10px;}
+  h2 .n{font-size:14px; font-weight:700; color:#fff; background:var(--primary-2);
+    border-radius:7px; padding:2px 9px; letter-spacing:.04em;}
+  h3{color:var(--primary-2); font-size:17.5px; margin:22px 0 8px;}
+  p{margin:9px 0;}
+  .lead{color:var(--muted);}
+  ul,ol{margin:8px 0 8px; padding-left:22px;}
+  li{margin:4px 0;}
+  code, .kbd{background:var(--chip); padding:1px 6px; border-radius:5px; font-size:14px;}
+  /* boxes */
+  .box{border-radius:11px; padding:14px 18px 12px; margin:14px 0; border:1px solid; position:relative;}
+  .box .lb{font-weight:700; font-size:12.5px; letter-spacing:.08em; text-transform:uppercase;
+    display:inline-block; margin-bottom:5px;}
+  .ex{background:var(--ex-bg); border-color:var(--ex-bd);}
+  .ex .lb{color:var(--ex-lb);}
+  .tip{background:var(--tip-bg); border-color:var(--tip-bd);}
+  .tip .lb{color:var(--tip-lb);}
+  .warn{background:var(--warn-bg); border-color:var(--warn-bd);}
+  .warn .lb{color:var(--warn-lb);}
+  .key{background:#fff; border-color:var(--rule); border-left:4px solid var(--primary-2);}
+  .key .lb{color:var(--primary-2);}
+  .box p:first-of-type{margin-top:2px}
+  .box p:last-child{margin-bottom:2px}
+  /* table */
+  .tablewrap{overflow-x:auto; margin:14px 0;}
+  table{border-collapse:collapse; width:100%; font-size:14px; background:#fff;
+    border:1px solid var(--rule); border-radius:10px; overflow:hidden;}
+  th,td{padding:9px 12px; text-align:left; border-bottom:1px solid var(--rule); vertical-align:top;}
+  th{background:#EEF3F5; color:var(--primary); font-weight:700;}
+  tr:last-child td{border-bottom:none;}
+  td:first-child{font-weight:600; color:var(--primary-2); white-space:nowrap;}
+  .steps{counter-reset:s; list-style:none; padding-left:0;}
+  .steps li{counter-increment:s; padding-left:34px; position:relative; margin:8px 0;}
+  .steps li::before{content:counter(s); position:absolute; left:0; top:1px;
+    width:23px; height:23px; background:var(--primary-2); color:#fff; border-radius:50%;
+    font-size:13px; font-weight:700; display:grid; place-items:center;}
+  .formula{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:6px 16px;margin:12px 0;overflow-x:auto;}
+  hr.soft{border:none;border-top:1px dashed var(--rule);margin:22px 0;}
+  footer{color:var(--muted); font-size:13px; text-align:center; padding:30px 0 10px; border-top:1px solid var(--rule);}
+  /* mobile */
+  .menubtn{display:none;}
+  @media (max-width:880px){
+    .wrap{grid-template-columns:1fr; gap:0;}
+    nav.toc{position:fixed; z-index:40; top:0; left:0; width:280px; height:100vh; background:var(--panel);
+      box-shadow:6px 0 24px rgba(0,0,0,.16); transform:translateX(-105%); transition:transform .25s; padding-left:18px;}
+    nav.toc.open{transform:translateX(0);}
+    .menubtn{display:inline-flex; position:fixed; z-index:50; top:14px; right:14px;
+      background:var(--primary); color:#fff; border:none; border-radius:9px; padding:9px 13px;
+      font-size:14px; font-weight:600; box-shadow:0 4px 14px rgba(0,0,0,.2); cursor:pointer;}
+    main{padding-top:14px;}
+    header.hero h1{font-size:23px;}
+  }
+  @media print{
+    nav.toc,.menubtn{display:none;} .wrap{display:block;} header.hero{box-shadow:none;}
+    body{background:#fff;} .box{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<button class="menubtn" onclick="document.querySelector('nav.toc').classList.toggle('open')">☰ 目录</button>
+<div class="wrap">
+
+<nav class="toc">
+  <div class="brand">最优化理论</div>
+  <div class="sub">期末复习手册 · 讲解 + 例题</div>
+  <a class="grp" href="#s0">0 · 预备知识</a>
+  <a href="#s1">1 · 凸函数与凸优化</a>
+  <a href="#s2">2 · 无约束最优性条件</a>
+  <a href="#s3">3 · 一维搜索（线搜索）</a>
+  <a class="grp" href="#s4">4 · 无约束优化算法</a>
+  <a href="#s4-1">　4.1 最速下降法</a>
+  <a href="#s4-2">　4.2 牛顿法</a>
+  <a href="#s4-3">　4.3 共轭梯度法</a>
+  <a href="#s4-4">　4.4 拟牛顿法</a>
+  <a href="#s5">5 · 算法特点对比表</a>
+  <a class="grp" href="#s6">6 · 约束优化与 KKT</a>
+  <a href="#s7">7 · 对偶理论</a>
+  <a href="#s8">8 · 罚函数法</a>
+  <a href="#s9">9 · 速查清单</a>
+</nav>
+
+<main>
+<header class="hero">
+  <h1>最优化理论 · 期末复习手册</h1>
+  <p>把整门课压缩成一条主线：先判断函数好不好（凸性）→ 找最优点的条件（最优性条件）→ 怎么一步步算出来（各类算法）→ 带约束怎么办（KKT、对偶、罚函数）。每节都是「直觉讲解 + 关键公式 + 例题」。</p>
+  <div class="tags">
+    <span>凸函数</span><span>最优性条件</span><span>线搜索</span><span>梯度法</span>
+    <span>牛顿/拟牛顿</span><span>共轭梯度</span><span>KKT</span><span>对偶</span><span>罚函数</span>
+  </div>
+</header>
+
+<!-- ================= 0 预备知识 ================= -->
+<section id="s0">
+  <h2><span class="n">0</span>预备知识：梯度、Hessian、正定</h2>
+  <p class="lead">这几样是全课的「计算工具」，几乎每道题都要用。</p>
+
+  <h3>梯度与 Hessian 矩阵</h3>
+  <ul>
+    <li><b>梯度</b> $\nabla f(x)$：所有一阶偏导组成的列向量，指向函数增长最快的方向。</li>
+    <li><b>Hessian 矩阵</b> $\nabla^2 f(x)$：所有二阶偏导组成的对称矩阵，刻画弯曲程度。</li>
+  </ul>
+  <div class="box key">
+    <span class="lb">必背：二次型的导数</span>
+    <p>设 $A$ 为对称矩阵：</p>
+    <div class="formula">$$f(x)=\tfrac12 x^{\mathsf T}Ax+b^{\mathsf T}x+c \;\Rightarrow\; \nabla f(x)=Ax+b,\quad \nabla^2 f(x)=A.$$</div>
+    <div class="formula">$$f(x)=x^{\mathsf T}Ax \;\Rightarrow\; \nabla f(x)=2Ax,\quad \nabla^2 f(x)=2A.$$</div>
+  </div>
+  <div class="box warn">
+    <span class="lb">易错点 · 对称化</span>
+    <p>套用上面公式前，中间矩阵<b>必须是对称的</b>。若题目给的 $A$ 不对称，先改写成对称二次型：把系数矩阵换成 $\tfrac12(A+A^{\mathsf T})$。例如 $x^{\mathsf T}\!\begin{bmatrix}4&2\sqrt2\\0&5\end{bmatrix}\!x$ 要先对称化为 $\tfrac12 x^{\mathsf T}\!\begin{bmatrix}8&2\sqrt2\\2\sqrt2&10\end{bmatrix}\!x$。</p>
+  </div>
+
+  <h3>方向导数</h3>
+  <p>函数在 $\bar x$ 沿单位方向 $d$ 的变化率：</p>
+  <div class="formula">$$\frac{\partial f}{\partial d}(\bar x)=\nabla f(\bar x)^{\mathsf T}\frac{d}{\|d\|},\qquad
+  \frac{\partial^2 f}{\partial d^2}(\bar x)=\frac{1}{\|d\|^2}\,d^{\mathsf T}\nabla^2 f(\bar x)\,d.$$</div>
+
+  <h3>正定 / 半正定的判定</h3>
+  <ul>
+    <li><b>顺序主子式法（Sylvester）：</b>所有顺序主子式 $\Delta_1,\Delta_2,\dots,\Delta_n$ 都 $>0$ ⟺ 正定。</li>
+    <li><b>特征值法：</b>所有特征值 $>0$ ⟺ 正定；$\ge 0$ ⟺ 半正定；有正有负 ⟹ 不定（鞍点常出现）。</li>
+    <li><b>负定 / 半负定</b>对应判断凹函数；$-A$ 正定即 $A$ 负定。</li>
+  </ul>
+
+  <h3>📝 例题精练（5 道）</h3>
+  <div class="box ex"><span class="lb">练习 0.1 · 求梯度与 Hessian</span>
+    <p><b>题：</b>$f(x)=3x_1^2+2x_1x_2+x_2^2+x_1-x_2$。</p>
+    <p><b>解：</b>$\nabla f=\begin{pmatrix}6x_1+2x_2+1\\ 2x_1+2x_2-1\end{pmatrix}$，$\nabla^2 f=\begin{bmatrix}6&2\\2&2\end{bmatrix}$（二次型 ⟹ Hessian 为常数矩阵）。</p></div>
+  <div class="box ex"><span class="lb">练习 0.2 · 非对称矩阵先对称化</span>
+    <p><b>题：</b>$f(x)=x^{\mathsf T}\!\begin{bmatrix}4&2\sqrt2\\0&5\end{bmatrix}\!x$，求 $\nabla f,\ \nabla^2 f$。</p>
+    <p><b>解：</b>先对称化 $A_s=\tfrac12(A+A^{\mathsf T})=\begin{bmatrix}4&\sqrt2\\\sqrt2&5\end{bmatrix}$。则 $\nabla f=2A_sx=\begin{pmatrix}8x_1+2\sqrt2\,x_2\\ 2\sqrt2\,x_1+10x_2\end{pmatrix}$，$\nabla^2 f=2A_s=\begin{bmatrix}8&2\sqrt2\\2\sqrt2&10\end{bmatrix}$。</p></div>
+  <div class="box ex"><span class="lb">练习 0.3 · 方向导数</span>
+    <p><b>题：</b>$f(x)=x_1^2+x_2^2$ 在 $\bar x=(1,2)$ 沿 $d=(3,4)$ 的方向导数。</p>
+    <p><b>解：</b>$\nabla f(\bar x)=(2,4)$，$\|d\|=5$。$\dfrac{\partial f}{\partial d}=\dfrac{\nabla f^{\mathsf T}d}{\|d\|}=\dfrac{2\cdot3+4\cdot4}{5}=\dfrac{22}{5}=4.4$。</p></div>
+  <div class="box ex"><span class="lb">练习 0.4 · 顺序主子式判正定</span>
+    <p><b>题：</b>判断 $A=\begin{bmatrix}2&-1&0\\-1&2&-1\\0&-1&2\end{bmatrix}$ 是否正定。</p>
+    <p><b>解：</b>$\Delta_1=2>0,\ \Delta_2=\det\!\begin{bmatrix}2&-1\\-1&2\end{bmatrix}=3>0,\ \Delta_3=\det A=4>0$，全正 ⟹ <b>正定</b>。</p></div>
+  <div class="box ex"><span class="lb">练习 0.5 · 不定矩阵（鞍点信号）</span>
+    <p><b>题：</b>判断 $A=\begin{bmatrix}1&2\\2&1\end{bmatrix}$ 的定号性。</p>
+    <p><b>解：</b>$\Delta_1=1>0$ 但 $\Delta_2=\det A=1-4=-3<0$；特征值 $3,-1$ 一正一负 ⟹ <b>不定</b>（作目标 Hessian 时对应鞍点）。</p></div>
+</section>
+
+<!-- ================= 1 凸函数 ================= -->
+<section id="s1">
+  <h2><span class="n">1</span>凸函数与凸优化</h2>
+  <p class="lead">为什么先讲凸？因为<b>凸问题的局部最优就是全局最优</b>，KKT 点直接是全局解——凸性是「好做」的标志。</p>
+
+  <h3>定义</h3>
+  <div class="formula">$$f\big((1-\lambda)x+\lambda y\big)\le (1-\lambda)f(x)+\lambda f(y),\quad \forall x,y,\ \lambda\in[0,1].$$</div>
+  <p>几何上：函数图像上任意两点连线都在曲线<b>上方</b>。严格不等号则为<b>严格凸</b>。</p>
+
+  <h3>三种判定方法（可微时等价）</h3>
+  <div class="tablewrap">
+  <table>
+    <tr><th>方法</th><th>条件</th><th>说明</th></tr>
+    <tr><td>定义</td><td>限制在任意直线上仍是凸的</td><td>$\varphi(\alpha)=f(x+\alpha d)$ 对 $\alpha$ 凸</td></tr>
+    <tr><td>一阶条件</td><td>$f(y)\ge f(x)+\nabla f(x)^{\mathsf T}(y-x)$</td><td>函数恒在切平面上方</td></tr>
+    <tr><td>二阶条件</td><td>$\nabla^2 f(x)\succeq 0$（半正定）</td><td><b>最常用</b>，求 Hessian 判半正定即可</td></tr>
+    <tr><td>梯度单调</td><td>$(\nabla f(x)-\nabla f(y))^{\mathsf T}(x-y)\ge 0$</td><td>梯度是单调映射</td></tr>
+  </table>
+  </div>
+  <div class="box warn">
+    <span class="lb">严格凸 · 充分不必要</span>
+    <p>$\nabla^2 f\succ 0$（正定）$\Rightarrow$ 严格凸，但反过来不一定（例如 $f=x^4$ 严格凸，而 $f''(0)=0$ 只半正定）。所以「严格凸 ⟹ Hessian 半正定」，但不能要求处处正定。</p>
+  </div>
+
+  <h3>保凸运算（用来快速判断复杂函数）</h3>
+  <ul>
+    <li>非负加权和：$\alpha f$（$\alpha\ge0$）、$f_1+f_2$ 仍凸。</li>
+    <li>与仿射复合：$f(Ax+b)$ 仍凸；仿射函数的任意范数 $\|Ax+b\|$ 凸。</li>
+    <li>逐点取最大 / 上确界：$\max\{f_1,\dots,f_m\}$、$\sup_y f(x,y)$ 凸。</li>
+    <li>复合：$h(g(x))$，若 $g$ 凸、$h$ 凸且单调不减 ⟹ 凸。</li>
+  </ul>
+
+  <h3>凸优化的核心结论</h3>
+  <div class="box key">
+    <span class="lb">两条必记结论</span>
+    <p>① <b>凸优化的局部解必是全局解。</b>（反证：若有更优点，凸组合会更小，矛盾。）</p>
+    <p>② <b>可微凸函数</b>：$\nabla f(x^*)=0 \Leftrightarrow x^*$ 是全局最小（充要）。强凸函数若存在最小值，则最小点<b>唯一</b>。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 判断凸函数</span>
+    <p>$f(x)=4x_1^2+3x_2^2+5x_3^2+6x_1x_2+x_1x_3-3x_1-2x_2+15$。</p>
+    <p><b>解：</b>Hessian 为 $F(x)=\begin{bmatrix}8&6&1\\6&6&0\\1&0&10\end{bmatrix}$（常数矩阵）。</p>
+    <p>顺序主子式：$\Delta_1=8>0,\ \Delta_2=\det\begin{bmatrix}8&6\\6&6\end{bmatrix}=12>0,\ \Delta_3=\det F=114>0$，故 $F\succ0$ 正定。所以 $f$ 是 $\mathbb R^3$ 上的<b>凸函数</b>。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 说明是凸规划</span>
+    <p>$\min f(x)$，s.t. $g_i(x)\le0,\ h_i(x)=0,\ x\in X$。若 $f,g_i$ 凸、$h_i$ 仿射、$X$ 凸集，则为凸规划。</p>
+    <p><b>要点：</b>$g_i$ 凸 ⟹ 其 0-下水平集是凸集；$h_i$ 仿射 ⟹ 等式约束集是凸集；凸集的交仍是凸集 ⟹ 可行域是凸集，目标凸 ⟹ 凸规划。</p>
+  </div>
+
+  <h3>📝 例题精练（5 道）</h3>
+  <div class="box ex"><span class="lb">练习 1.1 · 三元函数判凸</span>
+    <p><b>题：</b>$f=x_1^2+2x_2^2+3x_3^2+2x_1x_2-2x_2x_3$。</p>
+    <p><b>解：</b>$\nabla^2 f=\begin{bmatrix}2&2&0\\2&4&-2\\0&-2&6\end{bmatrix}$，$\Delta_1=2,\Delta_2=4,\Delta_3=16$ 全正 ⟹ 正定 ⟹ <b>凸函数</b>。</p></div>
+  <div class="box ex"><span class="lb">练习 1.2 · 既非凸也非凹</span>
+    <p><b>题：</b>$f=x_1^3+x_2^3$。</p>
+    <p><b>解：</b>$\nabla^2 f=\begin{bmatrix}6x_1&0\\0&6x_2\end{bmatrix}$，符号随 $x$ 变（$(1,1)$ 处正定、$(-1,-1)$ 处负定）⟹ <b>既不是凸也不是凹</b>。</p></div>
+  <div class="box ex"><span class="lb">练习 1.3 · 保凸运算：对数障碍</span>
+    <p><b>题：</b>证 $f(x)=-\sum_{i=1}^m\log(b_i-a_i^{\mathsf T}x)$ 凸。</p>
+    <p><b>解：</b>$b_i-a_i^{\mathsf T}x$ 仿射（凹），$-\log(\cdot)$ 是凸且不增，与凹复合得凸；<b>非负和</b>仍凸。∎</p></div>
+  <div class="box ex"><span class="lb">练习 1.4 · 保凸运算：分段线性</span>
+    <p><b>题：</b>证 $f(x)=\max\{x_1+2x_2,\ 3x_1-x_2,\ x_2\}$ 凸。</p>
+    <p><b>解：</b>三个仿射函数都凸，<b>逐点取最大</b>保凸 ⟹ $f$ 凸（图像为"折面"）。∎</p></div>
+  <div class="box ex"><span class="lb">练习 1.5 · 二次比线性</span>
+    <p><b>题：</b>证 $f(x,y)=x^2/y\ (y>0)$ 凸。</p>
+    <p><b>解：</b>$\nabla^2 f=\dfrac{2}{y^3}\begin{pmatrix}y\\-x\end{pmatrix}\!\begin{pmatrix}y\\-x\end{pmatrix}^{\mathsf T}\succeq0$（外积半正定，$y>0$）⟹ 凸。∎</p></div>
+</section>
+
+<!-- ================= 2 无约束最优性条件 ================= -->
+<section id="s2">
+  <h2><span class="n">2</span>无约束问题的最优性条件</h2>
+  <p class="lead">「怎么判断一个点是不是极小点」——分一阶、二阶看。</p>
+
+  <div class="box key">
+    <span class="lb">三档条件</span>
+    <p><b>一阶必要条件：</b>$x^*$ 局部解 $\Rightarrow \nabla f(x^*)=0$（称为平稳点 / 驻点）。</p>
+    <p><b>二阶必要条件：</b>局部解 $\Rightarrow \nabla f(x^*)=0$ 且 $\nabla^2 f(x^*)\succeq0$（半正定）。</p>
+    <p><b>二阶充分条件：</b>$\nabla f(x^*)=0$ 且 $\nabla^2 f(x^*)\succ0$（正定）$\Rightarrow x^*$ 是<b>严格</b>局部极小点。</p>
+  </div>
+  <div class="box warn">
+    <span class="lb">易错点 · 必要不等于充分</span>
+    <p>① 满足一阶、二阶必要条件的点<b>不一定</b>是极小点：$f(x)=x^3$ 在 $x=0$ 处 $f'=f''=0$ 都满足，却是拐点。</p>
+    <p>② 当 Hessian 在平稳点<b>半正定但不正定</b>时不能直接下结论，要在邻域里进一步分析。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 求极小点并判全局</span>
+    <p>$\min f=8x_1^2+3x_1x_2+7x_2^2-19x_1-17x_2-29$。</p>
+    <p>$\nabla f=\begin{pmatrix}16x_1+3x_2-19\\3x_1+14x_2-17\end{pmatrix}=0 \Rightarrow x^0=(1,1)^{\mathsf T}$。</p>
+    <p>$\nabla^2 f=\begin{bmatrix}16&3\\3&14\end{bmatrix}\succ0$ ⟹ 平稳点为局部极小点。又因目标函数凸，<b>局部即全局</b>。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 半正定时的处理</span>
+    <p>$f(x)=(x_1-2)^4+(x_1-2x_2)^2$。平稳点 $x^*=(2,1)^{\mathsf T}$，此处 $\nabla^2 f(x^*)=\begin{bmatrix}2&-4\\-4&8\end{bmatrix}$ 半正定，不能直接判断。</p>
+    <p>取邻域点 $x=x^*+\Delta x$，得 $H(x)=\begin{bmatrix}12\Delta x_1^2+2&-4\\-4&8\end{bmatrix}$，验证其半正定，由定理可知 $x^*$ 是<b>局部极小点</b>。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 临界点分类</span>
+    <p>$f=2x_1^3+3x_1^2+12x_1x_2+3x_2^2-6x_2+6$。临界点 $[1,-1]^{\mathsf T}$ 与 $[2,-3]^{\mathsf T}$。</p>
+    <p>$H_f(1,-1)=\begin{bmatrix}18&12\\12&6\end{bmatrix}$ 特征值约 $25.4,\,-1.4$ ⟹ 不定 ⟹ <b>鞍点</b>；
+       $H_f(2,-3)=\begin{bmatrix}30&12\\12&6\end{bmatrix}$ 特征值约 $35,\,1$ ⟹ 正定 ⟹ <b>局部极小</b>。</p>
+  </div>
+
+  <h3>📝 例题精练（5 道）</h3>
+  <div class="box ex"><span class="lb">练习 2.1 · 凸二次求全局极小</span>
+    <p><b>题：</b>$\min f=x_1^2+x_2^2-4x_1-6x_2+13$。</p>
+    <p><b>解：</b>$\nabla f=(2x_1-4,2x_2-6)=0\Rightarrow x^*=(2,3)$。$\nabla^2 f=2I\succ0$ ⟹ 严格极小；$f$ 凸 ⟹ <b>全局极小</b>，$f(x^*)=0$。</p></div>
+  <div class="box ex"><span class="lb">练习 2.2 · 鞍点</span>
+    <p><b>题：</b>$f=x_1^2-x_2^2$。</p>
+    <p><b>解：</b>$\nabla f=(2x_1,-2x_2)=0\Rightarrow(0,0)$。$\nabla^2 f=\begin{bmatrix}2&0\\0&-2\end{bmatrix}$ 不定 ⟹ <b>鞍点</b>（非极值）。</p></div>
+  <div class="box ex"><span class="lb">练习 2.3 · 多驻点分类</span>
+    <p><b>题：</b>$f=x_1^3-3x_1+x_2^2$。</p>
+    <p><b>解：</b>$\nabla f=(3x_1^2-3,2x_2)=0\Rightarrow x_1=\pm1,x_2=0$。$\nabla^2 f=\begin{bmatrix}6x_1&0\\0&2\end{bmatrix}$：$(1,0)$ 正定 ⟹ 局部极小；$(-1,0)$ 不定 ⟹ 鞍点。$f\to-\infty\ (x_1\to-\infty)$ ⟹ <b>无全局极小</b>。</p></div>
+  <div class="box ex"><span class="lb">练习 2.4 · 半正定时邻域分析</span>
+    <p><b>题：</b>$f=x_1^4+x_2^2$。</p>
+    <p><b>解：</b>$\nabla f=(4x_1^3,2x_2)=0\Rightarrow(0,0)$，$\nabla^2 f(0)=\begin{bmatrix}0&0\\0&2\end{bmatrix}$ 半正定（判别失效）。但邻域 $\nabla^2 f=\begin{bmatrix}12x_1^2&0\\0&2\end{bmatrix}\succeq0$ 恒成立 ⟹ $f$ 凸 ⟹ $(0,0)$ 是<b>全局极小</b>（$f\ge0$）。</p></div>
+  <div class="box ex"><span class="lb">练习 2.5 · 最小二乘正规方程</span>
+    <p><b>题：</b>$\min\tfrac12\|Ax-b\|^2$，$A=\begin{bmatrix}1&1\\1&2\\1&3\end{bmatrix},b=(1,2,2)^{\mathsf T}$。</p>
+    <p><b>解：</b>正规方程 $A^{\mathsf T}Ax=A^{\mathsf T}b$ 即 $\begin{bmatrix}3&6\\6&14\end{bmatrix}x=\begin{pmatrix}5\\11\end{pmatrix}$，解得 $x^*=(\tfrac23,\tfrac12)$。$A^{\mathsf T}A\succ0$ ⟹ 唯一全局极小。</p></div>
+</section>
+
+<!-- ================= 3 线搜索 ================= -->
+<section id="s3">
+  <h2><span class="n">3</span>一维搜索（线搜索）</h2>
+  <p class="lead">所有迭代算法都是「定方向 $d_k$ → 沿这条线找最优步长 $\alpha_k$」。本节解决第二步。</p>
+
+  <h3>精确步长：二次函数的显式公式</h3>
+  <div class="box key">
+    <span class="lb">必背公式</span>
+    <p>对 $f(x)=\tfrac12 x^{\mathsf T}Gx+g^{\mathsf T}x+b$（$G$ 对称正定），沿下降方向 $d_k$ 的最优步长：</p>
+    <div class="formula">$$\alpha_k=-\frac{\nabla f(x_k)^{\mathsf T}d_k}{d_k^{\mathsf T}Gd_k}.$$</div>
+    <p>一般非二次函数可近似为 $\alpha=\dfrac{g_k^{\mathsf T}g_k}{g_k^{\mathsf T}\nabla^2 f(x_k)\,g_k}$。</p>
+  </div>
+
+  <h3>黄金分割法（区间收缩）</h3>
+  <p>不需要导数，靠比较函数值不断缩小含极小点的区间。压缩比 $\rho=\tfrac{3-\sqrt5}{2}\approx0.382$，每步区间长缩为原来的 $0.618$。$N$ 步后缩到原长的 $0.618^N$。</p>
+  <ol class="steps">
+    <li>取两中间点 $a_1=a_0+\rho(b_0-a_0)$，$b_1=a_0+(1-\rho)(b_0-a_0)$。</li>
+    <li>比较 $f(a_1)$ 与 $f(b_1)$：函数值<b>大</b>的那端被替换，保留含极小点的子区间。</li>
+    <li>下一步<b>复用</b>上一步留下的内点（只需新算一个点），重复直到区间长 $<$ 精度。</li>
+  </ol>
+  <div class="box tip">
+    <span class="lb">小技巧 · 复用内点</span>
+    <p>若 $f(a_1)<f(b_1)$，区间换成 $[a_0,b_1]$，并令下一步 $b_2=a_1$（固定刚变化的那端，旧内点直接当新内点用），省一次函数计算。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 黄金分割</span>
+    <p>用黄金分割法求 $f(x)=x^4-14x^3+60x^2-70x$ 在 $[0,2]$ 上的极小点，要求区间长压到 $0.3$ 以内。</p>
+    <p>需 $(0.618)^N\le 0.3/2 \Rightarrow N=4$。逐步算：第1次 $a_1=0.764,b_1=1.236$，$f(a_1)=-24.36<f(b_1)=-18.96$，区间缩为 $[0,1.236]$；继续迭代，4 步后区间 $[0.6525,0.9443]$，长度 $0.292<0.3$，满足要求。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 牛顿法做一维搜索</span>
+    <p>$f(x)=\tfrac12x^2-\sin x$，$x^{(0)}=0.5$，用 $x^{(k+1)}=x^{(k)}-\dfrac{f'(x^{(k)})}{f''(x^{(k)})}$，其中 $f'=x-\cos x,\ f''=1+\sin x$。</p>
+    <p>迭代得 $x^{(1)}=0.7552\to x^{(2)}=0.7391\to x^{(3)}=x^{(4)}=0.7390$，$f''>0$，故为严格极小点。</p>
+  </div>
+
+  <h3>📝 例题精练（5 道）</h3>
+  <div class="box ex"><span class="lb">练习 3.1 · 二次型精确步长</span>
+    <p><b>题：</b>$f=\tfrac12 x^{\mathsf T}\!\begin{bmatrix}2&0\\0&8\end{bmatrix}\!x$，在 $x=(1,1)$ 沿 $d=-\nabla f$。</p>
+    <p><b>解：</b>$\nabla f=(2,8)=g$，$d=(-2,-8)$。$\alpha=-\dfrac{g^{\mathsf T}d}{d^{\mathsf T}Ad}=-\dfrac{-68}{520}=\dfrac{17}{130}\approx0.131$。</p></div>
+  <div class="box ex"><span class="lb">练习 3.2 · 黄金分割步数</span>
+    <p><b>题：</b>区间 $[0,1]$ 用黄金分割压到长度 $<0.1$，至少几步？</p>
+    <p><b>解：</b>每步乘 $0.618$，需 $0.618^N<0.1$。$0.618^4\approx0.146,\ 0.618^5\approx0.090<0.1$ ⟹ <b>$N=5$</b>。</p></div>
+  <div class="box ex"><span class="lb">练习 3.3 · 牛顿法一维求极小</span>
+    <p><b>题：</b>$f(x)=x^2+e^{-x}$，$x_0=0$，$x_{k+1}=x_k-\dfrac{f'}{f''}$，$f'=2x-e^{-x},f''=2+e^{-x}$。</p>
+    <p><b>解：</b>$x_1=0-\dfrac{-1}{3}=0.333\to x_2\approx0.351\to x_3\approx0.3517$ 收敛，$f''>0$ ⟹ 极小点。</p></div>
+  <div class="box ex"><span class="lb">练习 3.4 · Armijo 回退</span>
+    <p><b>题：</b>$f=x^2,\ x=2,\ d=-\nabla f=-4,\ c_1=0.1$，检验步长。</p>
+    <p><b>解：</b>$\alpha=1$：$f(2-4)=4$，而 $f(2)+c_1\alpha\nabla f^{\mathsf T}d=4+0.1(-16)=2.4$，$4\not\le2.4$ <b>不满足</b>。回退到 $\alpha=0.25$：$f(1)=1\le 4+0.1\cdot0.25\cdot(-16)=3.6$ <b>满足</b>，接受。</p></div>
+  <div class="box ex"><span class="lb">练习 3.5 · 最速下降精确步长一步</span>
+    <p><b>题：</b>$f=\tfrac12(x_1^2+10x_2^2)$，$x_0=(10,1)$。</p>
+    <p><b>解：</b>$A=\mathrm{diag}(1,10)$，$g=(10,10)$，$\alpha=\dfrac{g^{\mathsf T}g}{g^{\mathsf T}Ag}=\dfrac{200}{1100}=\dfrac{2}{11}$，$x_1=(10,1)-\tfrac2{11}(10,10)=(\tfrac{90}{11},-\tfrac{9}{11})$。</p></div>
+</section>
+
+<!-- ================= 4 无约束算法 ================= -->
+<section id="s4">
+  <h2><span class="n">4</span>无约束优化算法</h2>
+  <p class="lead">四大算法的区别只在于「方向 $d_k$ 怎么选」：负梯度 / 牛顿方向 / 共轭方向 / 拟牛顿方向。</p>
+
+  <h3 id="s4-1">4.1 最速下降法（梯度法）</h3>
+  <p>方向取负梯度 $d_k=-\nabla f(x_k)=-g_k$，是局部下降最快的方向。</p>
+  <div class="box key">
+    <span class="lb">二次型的显式迭代</span>
+    <div class="formula">$$g_k=Ax_k+b,\qquad
+    \alpha_k=\frac{g_k^{\mathsf T}g_k}{g_k^{\mathsf T}Ag_k},\qquad
+    x_{k+1}=x_k-\frac{g_k^{\mathsf T}g_k}{g_k^{\mathsf T}Ag_k}\,g_k.$$</div>
+    <p>停机：梯度 $\|g_k\|\approx0$ 或达到精度。</p>
+  </div>
+  <ul>
+    <li><b>锯齿现象：</b>相邻搜索方向正交 $g_{k+1}^{\mathsf T}g_k=0$，在狭长山谷里来回折返，效率低。</li>
+    <li><b>收敛性：</b>全局收敛；二次型上为<b>线性收敛</b>，收敛速度随<b>条件数</b>增大而变慢（条件数 $\gg1$ 即病态）。</li>
+    <li><b>固定步长</b>仅当步长满足一定范围才收敛（如某题需 $0<\alpha<2/12$）。</li>
+  </ul>
+  <div class="box ex">
+    <span class="lb">例题 · 锯齿路径</span>
+    <p>$\min f=\tfrac12 x_1^2+x_2^2$，$x^{(0)}=(2,1)^{\mathsf T}$。沿负梯度精确搜索得 $\alpha_0=\tfrac23$，$x^{(1)}=(\tfrac23,-\tfrac13)^{\mathsf T}$，一般地 $x^{(k)}=\big(\tfrac{2}{3^k},\tfrac{(-1)^k}{3^k}\big)^{\mathsf T}\to(0,0)$，路径呈锯齿。</p>
+  </div>
+
+  <p style="margin-top:14px"><b>📝 例题精练（5 道）</b></p>
+  <div class="box ex"><span class="lb">练习 4.1.1 · 锯齿迭代两步</span>
+    <p><b>题：</b>$f=x_1^2+4x_2^2$，$x_0=(4,1)$，精确步长。</p>
+    <p><b>解：</b>$A=\mathrm{diag}(2,8)$，$g_0=(8,8)$，$\alpha_0=\tfrac{128}{640}=\tfrac15$，$x_1=(\tfrac{12}5,-\tfrac35)$；$g_1=(\tfrac{24}5,-\tfrac{24}5)$，$\alpha_1=\tfrac15$，$x_2=(\tfrac{36}{25},\tfrac{9}{25})$。相邻方向正交，呈锯齿。</p></div>
+  <div class="box ex"><span class="lb">练习 4.1.2 · 固定步长收敛范围</span>
+    <p><b>题：</b>$f=\tfrac12 x^{\mathsf T}\mathrm{diag}(2,12)x$，固定步长 $\alpha$ 何时收敛？</p>
+    <p><b>解：</b>收敛 ⟺ $0<\alpha<\dfrac2{\lambda_{\max}}=\dfrac2{12}=\dfrac16$。</p></div>
+  <div class="box ex"><span class="lb">练习 4.1.3 · 最优固定步长与收敛比</span>
+    <p><b>题：</b>同上 $A=\mathrm{diag}(2,12)$，求最优固定步长与线性收敛比。</p>
+    <p><b>解：</b>$\alpha^*=\dfrac2{\lambda_{\min}+\lambda_{\max}}=\dfrac2{14}=\dfrac17$；条件数 $\kappa=6$，收敛比 $\dfrac{\kappa-1}{\kappa+1}=\dfrac57$。</p></div>
+  <div class="box ex"><span class="lb">练习 4.1.4 · 条件数与速度</span>
+    <p><b>题：</b>为何 $f=\tfrac12(x_1^2+100x_2^2)$ 比 $f=\tfrac12(x_1^2+x_2^2)$ 收敛慢得多？</p>
+    <p><b>解：</b>前者 $\kappa=100$，收敛比 $\tfrac{99}{101}\approx0.98$（每步仅降 ~2%）；后者 $\kappa=1$，一步到位。条件数越大越病态、锯齿越严重。</p></div>
+  <div class="box ex"><span class="lb">练习 4.1.5 · BB 步长</span>
+    <p><b>题：</b>已知 $s_k=(1,2),\ y_k=(2,2)$，求两种 BB 步长。</p>
+    <p><b>解：</b>$\alpha_{BB1}=\dfrac{s^{\mathsf T}y}{y^{\mathsf T}y}=\dfrac{6}{8}=\dfrac34$，$\alpha_{BB2}=\dfrac{s^{\mathsf T}s}{s^{\mathsf T}y}=\dfrac{5}{6}$。BB 步长使梯度法目标非单调但显著加速。</p></div>
+
+  <h3 id="s4-2">4.2 牛顿法</h3>
+  <p>用二阶信息，方向 $d_k=-[\nabla^2 f(x_k)]^{-1}\nabla f(x_k)$。</p>
+  <ul>
+    <li><b>经典牛顿法：</b>步长固定为 1；<b>阻尼牛顿法：</b>对步长再做线搜索。</li>
+    <li>只有 Hessian <b>正定</b>时才能保证牛顿方向是下降方向；不正定时需修正。</li>
+    <li>对<b>正定二次型</b>：任意初始点<b>一步</b>到最优，收敛阶 $\infty$，有二次终止性。</li>
+    <li>一般情形：需初始点靠近最优点（<b>局部收敛</b>），Hessian 正定时<b>二阶收敛</b>；Hessian 奇异则无法计算。</li>
+  </ul>
+  <div class="box ex">
+    <span class="lb">例题 · 牛顿法一步到解</span>
+    <p>$\min f=x_1^2+x_2^2+x_1x_2+2x_1-3x_2$，$x^{(0)}=(0,0)$。$\nabla f(x^{(0)})=(2,-3)^{\mathsf T}$，$\nabla^2 f=\begin{bmatrix}2&1\\1&2\end{bmatrix}$。</p>
+    <p>解 $\nabla^2 f\,d=-\nabla f$ 得 $d=(-\tfrac73,\tfrac83)^{\mathsf T}$，$x^{(1)}=(-\tfrac73,\tfrac83)^{\mathsf T}$，此时 $\|\nabla f(x^{(1)})\|=0$。二次多项式 ⟹ 一步结束。</p>
+  </div>
+  <div class="box warn">
+    <span class="lb">为何深度学习不用牛顿法</span>
+    <p>Hessian 太大：$10^7$ 个参数对应 $10^7\times10^7=10^{14}$ 个元素，求逆 / 解方程组代价极高。</p>
+  </div>
+
+  <p style="margin-top:14px"><b>📝 例题精练（5 道）</b></p>
+  <div class="box ex"><span class="lb">练习 4.2.1 · 二次型一步到位</span>
+    <p><b>题：</b>$\min f=2x_1^2+2x_2^2+2x_1x_2-6x_1$，$x_0=(0,0)$。</p>
+    <p><b>解：</b>$\nabla f=(4x_1+2x_2-6,\ 4x_2+2x_1)$，$\nabla f(0)=(-6,0)$；$\nabla^2 f=\begin{bmatrix}4&2\\2&4\end{bmatrix}$。解 $\nabla^2 f\,d=(6,0)$ 得 $d=(2,-1)$，$x_1=(2,-1)$，$\nabla f(x_1)=0$ ⟹ 一步到最优。</p></div>
+  <div class="box ex"><span class="lb">练习 4.2.2 · 一元牛顿求极小</span>
+    <p><b>题：</b>$f(x)=\tfrac12 x^2-\sin x$，$x_0=0.5$。</p>
+    <p><b>解：</b>$f'=x-\cos x,f''=1+\sin x$。$x_1=0.5-\dfrac{0.5-\cos0.5}{1+\sin0.5}=0.7552\to0.7391\to0.7390$ 二次收敛，$f''>0$ 为极小。</p></div>
+  <div class="box ex"><span class="lb">练习 4.2.3 · Hessian 奇异 ⟹ 失败</span>
+    <p><b>题：</b>说明牛顿法在 $\nabla^2 f$ 奇异 / 不正定处失效。</p>
+    <p><b>解：</b>牛顿方程 $\nabla^2 f\,d=-\nabla f$ 在 $\nabla^2 f$ 奇异时无唯一解，方向无法确定；不正定时牛顿方向可能非下降（奔向极大/鞍点）。补救：修正牛顿 $B=\nabla^2 f+\tau I\succ0$。</p></div>
+  <div class="box ex"><span class="lb">练习 4.2.4 · 阻尼牛顿法</span>
+    <p><b>题：</b>经典牛顿步长固定为 1 可能不下降，如何改？</p>
+    <p><b>解：</b>阻尼牛顿：方向仍 $d_k=-(\nabla^2 f)^{-1}\nabla f$，但步长 $\alpha_k$ 由线搜索（Armijo/Wolfe）确定，$x_{k+1}=x_k+\alpha_k d_k$，兼顾全局收敛与局部二阶速度。</p></div>
+  <div class="box ex"><span class="lb">练习 4.2.5 · 高斯-牛顿</span>
+    <p><b>题：</b>非线性最小二乘 $\min\tfrac12\|r(x)\|^2$ 的高斯-牛顿方向。</p>
+    <p><b>解：</b>设 Jacobian $J=\partial r/\partial x$，丢掉二阶项后方程近似为 $J^{\mathsf T}J\,d=-J^{\mathsf T}r$。$J^{\mathsf T}J$ 奇异时用 LM：$(J^{\mathsf T}J+\nu I)d=-J^{\mathsf T}r$。</p></div>
+
+  <h3 id="s4-3">4.3 共轭梯度法</h3>
+  <ul>
+    <li>对 $n$ 维二次型问题，最多 <b>$n$ 步</b>得到精确解（二次终止性）。</li>
+    <li>不必一开始就给出全部共轭方向，而是用系数 $\beta$ <b>逐步生成</b>。</li>
+    <li>步长仍用二次型公式 $\alpha_k=-\dfrac{g^{(k)\mathsf T}d^{(k)}}{d^{(k)\mathsf T}Sd^{(k)}}$（把梯度法里的 $-g$ 换成共轭方向 $d$）。</li>
+    <li>解<b>非二次型</b>问题时，凡出现矩阵 $S$ 的地方都要相应替换。</li>
+    <li>已知一组向量要构造共轭向量，可用 <b>Gram–Schmidt 正交化</b>（在 $A$ 度量意义下）。</li>
+  </ul>
+
+  <p style="margin-top:14px"><b>📝 例题精练（5 道）</b></p>
+  <div class="box ex"><span class="lb">练习 4.3.1 · 验证共轭</span>
+    <p><b>题：</b>$A=\begin{bmatrix}4&2\\2&2\end{bmatrix}$，验证 $d_0=(1,0),d_1=(-\tfrac38,\tfrac34)$ 是 $A$-共轭。</p>
+    <p><b>解：</b>$Ad_1=\begin{bmatrix}4&2\\2&2\end{bmatrix}(-\tfrac38,\tfrac34)^{\mathsf T}=(0,\tfrac34)^{\mathsf T}$，$d_0^{\mathsf T}Ad_1=1\cdot0+0\cdot\tfrac34=0$ ⟹ 共轭。∎</p></div>
+  <div class="box ex"><span class="lb">练习 4.3.2 · Gram-Schmidt 构造共轭方向</span>
+    <p><b>题：</b>由 $p_0=(1,0),p_1=(0,1)$ 关于上式 $A$ 构造共轭方向。</p>
+    <p><b>解：</b>$d_0=p_0=(1,0)$；$d_1=p_1-\dfrac{p_1^{\mathsf T}Ad_0}{d_0^{\mathsf T}Ad_0}d_0=(0,1)-\dfrac{2}{4}(1,0)=(-\tfrac12,1)$。验证 $d_0^{\mathsf T}Ad_1=0$。</p></div>
+  <div class="box ex"><span class="lb">练习 4.3.3 · 基本共轭方向法迭代</span>
+    <p><b>题：</b>$f=\tfrac12 x^{\mathsf T}\!\begin{bmatrix}4&2\\2&2\end{bmatrix}\!x+(1,-1)x$，$x_0=0$，用 $d_0=(1,0),d_1=(-\tfrac38,\tfrac34)$。</p>
+    <p><b>解：</b>$g_0=(1,-1)$，$\alpha_0=-\dfrac{g_0^{\mathsf T}d_0}{d_0^{\mathsf T}Ad_0}=-\tfrac14$，$x_1=(-\tfrac14,0)$；$g_1=(0,-\tfrac32)$，$\alpha_1=2$，$x_2=(-1,\tfrac32)$，$g_2=0$ ⟹ <b>2 步收敛</b>。</p></div>
+  <div class="box ex"><span class="lb">练习 4.3.4 · Fletcher-Reeves 自动生成方向</span>
+    <p><b>题：</b>$f=\tfrac12 x^{\mathsf T}\!\begin{bmatrix}4&1\\1&3\end{bmatrix}\!x-(1,2)x$，$x_0=0$，FR-CG。</p>
+    <p><b>解：</b>$g_0=(-1,-2),d_0=(1,2)$；$\alpha_0=\tfrac14$，$x_1=(\tfrac14,\tfrac12)$，$g_1=(\tfrac12,-\tfrac14)$，$\beta_0=\dfrac{\|g_1\|^2}{\|g_0\|^2}=\tfrac1{16}$，$d_1=-g_1+\beta_0 d_0$；$\alpha_1=\tfrac4{11}$，$x_2=(\tfrac1{11},\tfrac7{11})$，$g_2=0$ ⟹ 2 步收敛。</p></div>
+  <div class="box ex"><span class="lb">练习 4.3.5 · n 步终止性</span>
+    <p><b>题：</b>$n$ 维正定二次型，共轭梯度法最多几步？非二次型呢？</p>
+    <p><b>解：</b>正定二次型 <b>$\le n$ 步</b>精确收敛（二次终止性）；非二次型一般不会 $n$ 步收敛，需每 $n$ 步<b>重启</b>为负梯度方向。</p></div>
+
+  <h3 id="s4-4">4.4 拟牛顿法（DFP / BFGS）</h3>
+  <p>思想：用对称正定矩阵 $H_k$ <b>近似 Hessian 的逆</b>，避免直接算二阶导。记</p>
+  <div class="formula">$$y_k=\nabla f(x_{k+1})-\nabla f(x_k),\qquad s_k=x_{k+1}-x_k.$$</div>
+  <p>构造时要满足<b>拟牛顿条件</b>：$H_{k+1}y_k=s_k$（或 $B_{k+1}s_k=y_k$）。</p>
+  <div class="box key">
+    <span class="lb">DFP 更新公式（近似逆 $H$）</span>
+    <div class="formula">$$H_{k+1}=H_k+\frac{s_k s_k^{\mathsf T}}{s_k^{\mathsf T}y_k}-\frac{H_k y_k y_k^{\mathsf T}H_k}{y_k^{\mathsf T}H_k y_k}.$$</div>
+    <p>若 $H_k$ 对称正定且 $s_k^{\mathsf T}y_k>0$，则 $H_{k+1}$ 仍对称正定。</p>
+  </div>
+  <div class="box key">
+    <span class="lb">BFGS 更新公式</span>
+    <div class="formula">$$H_{k+1}^{\mathrm{BFGS}}=(I-\rho_k y_k s_k^{\mathsf T})^{\mathsf T}H_k(I-\rho_k y_k s_k^{\mathsf T})+\rho_k s_k s_k^{\mathsf T},\qquad \rho_k=\frac{1}{s_k^{\mathsf T}y_k}.$$</div>
+  </div>
+  <ul>
+    <li>二次型问题：Broyden 族（含 DFP、BFGS）最多 $n$ 步求出最优解，有二次终止性。</li>
+    <li>非二次型：拟牛顿法通常<b>不会</b>在 $n$ 步内收敛。</li>
+  </ul>
+  <div class="box tip">
+    <span class="lb">解题提醒</span>
+    <p>DFP / BFGS 求步长 $\alpha_k$ 时，先看是不是<b>二次型</b>：是 ⟹ 直接套精确步长公式 $\alpha_k=-\dfrac{g^{(k)\mathsf T}d^{(k)}}{d^{(k)\mathsf T}Qd^{(k)}}$；否则做线搜索。</p>
+  </div>
+  <div class="box ex">
+    <span class="lb">例题 · BFGS 解二次型</span>
+    <p>用 BFGS 求 $f(x)=\tfrac12 x^{\mathsf T}Ax-x^{\mathsf T}b$ 的极小，$A=\begin{bmatrix}5&-3\\-3&2\end{bmatrix},\ b=\begin{pmatrix}0\\1\end{pmatrix}$，$H_0=I_2,\ x^{(0)}=(0,0)^{\mathsf T}$。</p>
+    <p>$\alpha_0=\tfrac12,\ x^{(1)}=(0,\tfrac12)^{\mathsf T}$；更新得 $H_1=\begin{bmatrix}1&3/2\\3/2&11/4\end{bmatrix}$，$d^{(1)}=(3/2,9/4)^{\mathsf T}$，$\alpha_1=2$，$x^{(2)}=(3,5)^{\mathsf T}$，此时 $g^{(2)}=0$，并验证 $H_2=A^{-1}$。两步（$=n$）收敛。</p>
+  </div>
+
+  <p style="margin-top:14px"><b>📝 例题精练（5 道）</b></p>
+  <div class="box ex"><span class="lb">练习 4.4.1 · 割线方程</span>
+    <p><b>题：</b>$s_k=(1,0),y_k=(2,1)$，写出 $H_{k+1}$ 须满足的拟牛顿条件。</p>
+    <p><b>解：</b>$H_{k+1}y_k=s_k$ 即 $H_{k+1}(2,1)^{\mathsf T}=(1,0)^{\mathsf T}$；等价 $B_{k+1}s_k=y_k$。满足者不唯一，BFGS/DFP/SR1 是不同取法。</p></div>
+  <div class="box ex"><span class="lb">练习 4.4.2 · BFGS 两步解二次型（模拟题）</span>
+    <p><b>题：</b>$f=\tfrac12 x^{\mathsf T}Qx-x^{\mathsf T}b+10$，$Q=\begin{bmatrix}5&-3\\-3&2\end{bmatrix},b=(0,1)^{\mathsf T}$，$H_0=I,x_0=0$。</p>
+    <p><b>解：</b>$g_0=(0,-1),d_0=(0,1),\alpha_0=\tfrac12,x_1=(0,\tfrac12)$；$s_0=(0,\tfrac12),y_0=(-\tfrac32,1)$，$H_1=\begin{bmatrix}1&\tfrac32\\\tfrac32&\tfrac{11}4\end{bmatrix}$；$d_1=(\tfrac32,\tfrac94),\alpha_1=2,x_2=(3,5),g_2=0$。验证 $H_2=Q^{-1}=\begin{bmatrix}2&3\\3&5\end{bmatrix}$。<b>2 步收敛</b>。</p></div>
+  <div class="box ex"><span class="lb">练习 4.4.3 · DFP 更新一步</span>
+    <p><b>题：</b>$H_0=I,\ s_0=(0,\tfrac12),\ y_0=(-\tfrac32,1)$，用 DFP 求 $H_1$。</p>
+    <p><b>解：</b>$s^{\mathsf T}y=\tfrac12,\ y^{\mathsf T}H_0y=\tfrac{13}4$。$H_1=I+\dfrac{ss^{\mathsf T}}{s^{\mathsf T}y}-\dfrac{H_0yy^{\mathsf T}H_0}{y^{\mathsf T}H_0y}=\begin{bmatrix}\tfrac4{13}&\tfrac6{13}\\\tfrac6{13}&\tfrac{31}{26}\end{bmatrix}$。验证 $H_1y_0=(0,\tfrac12)=s_0$ ✓。</p></div>
+  <div class="box ex"><span class="lb">练习 4.4.4 · SR1 更新与缺陷</span>
+    <p><b>题：</b>写 SR1 公式并指出缺陷。</p>
+    <p><b>解：</b>$B_{k+1}=B_k+\dfrac{(y-B_ks)(y-B_ks)^{\mathsf T}}{(y-B_ks)^{\mathsf T}s}$（秩 1）。缺陷：分母 $(y-B_ks)^{\mathsf T}s$ 可能 $\le0$，<b>不保正定</b>，故线搜索型拟牛顿弃用，多用于信赖域。</p></div>
+  <div class="box ex"><span class="lb">练习 4.4.5 · 曲率条件</span>
+    <p><b>题：</b>BFGS 保持 $H_{k+1}\succ0$ 的关键条件？怎么保证？</p>
+    <p><b>解：</b>曲率条件 $s_k^{\mathsf T}y_k>0$。Wolfe 线搜索的曲率条件 $\nabla f(x_{k+1})^{\mathsf T}d\ge c_2\nabla f(x_k)^{\mathsf T}d$ 可推出 $s^{\mathsf T}y>0$，从而保正定。</p></div>
+</section>
+
+<!-- ================= 5 对比表 ================= -->
+<section id="s5">
+  <h2><span class="n">5</span>各算法特点对比（高频考点）</h2>
+  <div class="tablewrap">
+  <table>
+    <tr><th>算法</th><th>方向 $d_k$</th><th>收敛性 / 速度</th><th>二次终止性</th><th>备注</th></tr>
+    <tr><td>最速下降法</td><td>$-\nabla f$</td><td>全局收敛；二次型上线性收敛，条件数大则慢</td><td>无</td><td>有锯齿现象；病态时低效</td></tr>
+    <tr><td>牛顿法</td><td>$-(\nabla^2 f)^{-1}\nabla f$</td><td>正定二次型一步到位（阶 $\infty$）；一般为局部二阶收敛</td><td>有</td><td>需 Hessian 正定；奇异则失效</td></tr>
+    <tr><td>共轭梯度法</td><td>共轭方向（$\beta$ 生成）</td><td>$n$ 维二次型 $\le n$ 步收敛</td><td>有</td><td>不需存 Hessian，省内存</td></tr>
+    <tr><td>DFP / BFGS</td><td>$-H_k\nabla f$</td><td>二次型 $\le n$ 步；超线性收敛</td><td>有</td><td>非二次型一般不 $n$ 步收敛</td></tr>
+    <tr><td>Powell 法</td><td>无导数方向</td><td>加速方向关于 Hessian 共轭</td><td>有</td><td>不用梯度</td></tr>
+    <tr><td>外罚函数法</td><td>—</td><td>聚点为全局最优</td><td>—</td><td>有病态性</td></tr>
+    <tr><td>内罚函数法</td><td>—</td><td>聚点为全局最优</td><td>—</td><td>仅限不等式约束</td></tr>
+  </table>
+  </div>
+  <div class="box tip">
+    <span class="lb">一句话记忆</span>
+    <p>「<b>二次终止性</b>」= 对 $n$ 维正定二次型，在有限步（牛顿 1 步，共轭 / 拟牛顿 $\le n$ 步）内得到精确最优。最速下降法<b>没有</b>。</p>
+  </div>
+</section>
+
+<!-- ================= 6 约束优化 KKT ================= -->
+<section id="s6">
+  <h2><span class="n">6</span>约束优化与 KKT 条件</h2>
+  <p class="lead">带约束以后，「梯度为零」要升级成 KKT 条件。流程：验约束规范 → 写 KKT 找候选点 → 二阶充分条件验证。</p>
+
+  <h3>第一步：约束规范（满足其一即可）</h3>
+  <ul>
+    <li><b>LFCQ：</b>有效约束 $c_i(x)\ (i\in E\cup I(x^*))$ 都是<b>线性函数</b>。</li>
+    <li><b>LICQ：</b>有效约束的梯度 $\nabla c_i(x^*)$ <b>线性无关</b>，此时 $x^*$ 称正则点。</li>
+  </ul>
+  <div class="box warn">
+    <span class="lb">为什么要先验</span>
+    <p>约束规范<b>不成立</b>时，局部极小点<b>不一定</b>是 KKT 点。有效约束 $I(x^*)$ 指在 $x^*$ 处取等号（“紧”）的不等式约束。</p>
+  </div>
+
+  <h3>第二步：KKT 条件</h3>
+  <div class="box key">
+    <span class="lb">KKT 四件套（$x^*$ 局部解 + 约束规范 ⟹ 满足）</span>
+    <p><b>① 稳定性：</b>$\nabla f(x^*)+\sum_{i\in E\cup I}\lambda_i\nabla c_i(x^*)=0$</p>
+    <p><b>② 原始可行：</b>$c_i(x^*)=0\ (i\in E)$，$c_i(x^*)\le0\ (i\in I)$</p>
+    <p><b>③ 对偶可行：</b>$\lambda_i\ge0\ (i\in I)$（不等式约束的乘子非负）</p>
+    <p><b>④ 互补松弛：</b>$\lambda_i c_i(x^*)=0\ (i\in I)$</p>
+  </div>
+  <div class="box warn">
+    <span class="lb">易错点 · 求导范围</span>
+    <p>稳定性条件求导时，只对<b>所有等式约束</b> + <b>有效的不等式约束</b>求导（非有效约束乘子为 0，靠互补松弛剔除）。</p>
+  </div>
+
+  <h3>第三步：二阶充分条件（验证 KKT 点是否真极小）</h3>
+  <p>KKT 点未必是局部解。构造方向集合 $M$（与有效约束梯度正交的方向），检验 Lagrange 函数的 Hessian：在所有 $d\in M,\ d\ne0$ 上 $d^{\mathsf T}\nabla^2_{xx}L(x^*,\lambda^*)d>0$ ⟹ 严格局部极小。</p>
+  <div class="box tip">
+    <span class="lb">凸规划的福利</span>
+    <p>若问题是<b>可微凸规划</b>（$f,g_i$ 凸、$h_i$ 仿射），则满足 KKT 条件的点<b>直接是全局最优解</b>——KKT 是充分条件，不必再做二阶验证。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 等式约束 + 二阶验证</span>
+    <p>$\min f=x_1x_2$，s.t. $c(x)=x_1^2+x_2^2-1=0$。$L=x_1x_2+\lambda(x_1^2+x_2^2-1)$。</p>
+    <p>一阶条件 $\Rightarrow \lambda=\pm\tfrac12$，KKT 点 $(\pm\tfrac{\sqrt2}2,\pm\tfrac{\sqrt2}2)$。二阶验证：$\lambda=\tfrac12$ 时 $\nabla^2_xL=\begin{bmatrix}1&1\\1&1\end{bmatrix}$，在约束切方向 $M=\{(\alpha,\alpha)^{\mathsf T}\}$ 上 $d^{\mathsf T}\nabla^2_xL\,d=4\alpha^2>0$ ⟹ $(\tfrac{\sqrt2}2,-\tfrac{\sqrt2}2)$ 等为最优解，最优值 $-\tfrac12$；$\lambda=-\tfrac12$ 时为非极小。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 凸规划 KKT ⟹ 全局</span>
+    <p>$\min f=2x_1^2+2x_1x_2+x_2^2-10x_1-10x_2$，s.t. $x_1^2+x_2^2-5\le0,\ 3x_1+x_2-6\le0$。</p>
+    <p>验证 $x^*=(1,2)^{\mathsf T}$ 可行且满足 KKT。由于 $f,c_1,c_2$ 均一阶连续可微凸，故 $x^*$ 是<b>全局极小点</b>。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 约束规范不成立（反例）</span>
+    <p>$\min x_1$，s.t. $c_1=x_2-x_1^3\le0,\ c_2=-x_2\le0$。由 $x_1^3\ge x_2\ge0$ 知 $x^*=(0,0)^{\mathsf T}$ 是局部解。</p>
+    <p>但 $\nabla_x L(x^*,\lambda)=\begin{pmatrix}1\\ \lambda_1-\lambda_2\end{pmatrix}\ne\begin{pmatrix}0\\0\end{pmatrix}$ 对任意 $\lambda$ 都成立，故 $x^*$ <b>不是 KKT 点</b>——正因为约束规范不成立。</p>
+  </div>
+
+  <h3>📝 例题精练（5 道）</h3>
+  <div class="box ex"><span class="lb">练习 6.1 · 等式约束 Lagrange</span>
+    <p><b>题：</b>$\min x_1+x_2$ s.t. $x_1^2+x_2^2=1$。</p>
+    <p><b>解：</b>$L=x_1+x_2+\lambda(x_1^2+x_2^2-1)$。$1+2\lambda x_1=0,\,1+2\lambda x_2=0\Rightarrow x_1=x_2=\pm\tfrac1{\sqrt2}$。最小值 $-\sqrt2$ 在 $(-\tfrac1{\sqrt2},-\tfrac1{\sqrt2})$。</p></div>
+  <div class="box ex"><span class="lb">练习 6.2 · 不等式约束 KKT</span>
+    <p><b>题：</b>$\min (x_1-2)^2+(x_2-2)^2$ s.t. $x_1+x_2\le2$。</p>
+    <p><b>解：</b>无约束极小 $(2,2)$ 不可行 ⟹ 约束有效 $x_1+x_2=2$。KKT：$2(x_1-2)=-\mu,\,2(x_2-2)=-\mu\Rightarrow x_1=x_2=1,\ \mu=2\ge0$。解 $(1,1)$，$f=2$。</p></div>
+  <div class="box ex"><span class="lb">练习 6.3 · 有效集讨论</span>
+    <p><b>题：</b>$\min x_1^2+x_2^2$ s.t. $x_1\ge1$。</p>
+    <p><b>解：</b>设约束<b>无效</b>：无约束解 $(0,0)$ 不满足 $x_1\ge1$，弃。设<b>有效</b> $x_1=1$：$\min 1+x_2^2\Rightarrow x_2=0$，乘子 $\mu=2>0$ ✓。解 $(1,0)$。</p></div>
+  <div class="box ex"><span class="lb">练习 6.4 · 凸规划 KKT 即全局</span>
+    <p><b>题：</b>$\min x_1^2+x_2^2$ s.t. $x_1+x_2\ge2$（凸）。</p>
+    <p><b>解：</b>有效 $x_1+x_2=2$，对称得 $(1,1)$，$\mu=2\ge0$，KKT 成立。$f$、约束均凸 ⟹ $(1,1)$ 直接是<b>全局最优</b>，无需二阶验证。</p></div>
+  <div class="box ex"><span class="lb">练习 6.5 · 约束品性失效</span>
+    <p><b>题：</b>$\min x_1$ s.t. $x_2-x_1^3\le0,\ -x_2\le0$，局部解 $(0,0)$。</p>
+    <p><b>解：</b>在 $(0,0)$ 两有效约束梯度 $(0,1),(0,-1)$ 线性相关 ⟹ LICQ 失效。$\nabla_x L=(1,\lambda_1-\lambda_2)\ne0$ 对任意 $\lambda$ 都成立 ⟹ 非 KKT 点。说明 <b>CQ 不成立时局部解未必是 KKT 点</b>。</p></div>
+</section>
+
+<!-- ================= 7 对偶 ================= -->
+<section id="s7">
+  <h2><span class="n">7</span>对偶理论</h2>
+  <p class="lead">把「对 $x$ 求最小」和「对乘子求最大」对调，得到对偶问题——往往更好解或给出下界。</p>
+
+  <h3>构造对偶问题的套路</h3>
+  <ol class="steps">
+    <li>写 Lagrange 函数 $L(x,\lambda,\mu)=f(x)+\sum\lambda_i h_i+\sum\mu_i g_i$。</li>
+    <li>对 $x$ 求 $\min$ 得对偶函数 $d(\mu)=\min_x L$：对 $x$ 求导令其为 0，解出 $x$ 关于乘子的表达式，回代。</li>
+    <li>对偶问题：$\max\ d(\lambda,\mu)$，s.t. $\mu\ge0$。</li>
+  </ol>
+  <div class="box key">
+    <span class="lb">三条核心性质</span>
+    <p><b>对偶函数恒为凹函数</b>（无论原问题凸不凸）。</p>
+    <p><b>弱对偶：</b>$d(\lambda,\mu)\le f(x)$ 对任意可行解恒成立（对偶给原问题一个下界）。</p>
+    <p><b>强对偶：</b>凸优化 + 满足 <b>Slater 条件</b> ⟹ 对偶间隙为 0，即 $\max d=\min f$。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 写对偶问题</span>
+    <p>$\min f=x_1^2+x_2^2$，s.t. $c_1=-x_1+x_2+2\le0,\ c_2=\tfrac12 x_1+x_2+1\le0$。</p>
+    <p>$d(\mu)=\min_x\{x_1^2+x_2^2+\mu_1(-x_1+x_2+2)+\mu_2(\tfrac12x_1+x_2+1)\}
+       =-\tfrac12\mu_1^2-\tfrac14\mu_1\mu_2-\tfrac5{16}\mu_2^2+2\mu_1+\mu_2$。</p>
+    <p>对偶问题：$\max\ d(\mu)$，s.t. $\mu_1\ge0,\ \mu_2\ge0$。</p>
+  </div>
+
+  <div class="box ex">
+    <span class="lb">例题 · 线性规划的对偶</span>
+    <p>原：$\min c^{\mathsf T}x$，s.t. $Ax=b,\ x\ge0$。$L=c^{\mathsf T}x+\lambda^{\mathsf T}(b-Ax)$。</p>
+    <p>$d(\lambda)=b^{\mathsf T}\lambda$（当 $c-A^{\mathsf T}\lambda\ge0$，否则 $-\infty$）。对偶：$\max\ b^{\mathsf T}\lambda$，s.t. $A^{\mathsf T}\lambda\le c$。</p>
+  </div>
+
+  <h3>📝 例题精练（5 道）</h3>
+  <div class="box ex"><span class="lb">练习 7.1 · 不等式约束对偶</span>
+    <p><b>题：</b>$\min x^2$ s.t. $x\ge1$（即 $1-x\le0$）。</p>
+    <p><b>解：</b>$L=x^2+\mu(1-x)$，$\partial_x L=2x-\mu=0\Rightarrow x=\tfrac\mu2$。$d(\mu)=-\tfrac{\mu^2}4+\mu$，对偶 $\max_{\mu\ge0}(-\tfrac{\mu^2}4+\mu)$，极大在 $\mu=2$，$d=1=p^*$（强对偶）。</p></div>
+  <div class="box ex"><span class="lb">练习 7.2 · 最小范数解</span>
+    <p><b>题：</b>$\min\tfrac12\|x\|^2$ s.t. $Ax=b$（$A$ 行满秩）。</p>
+    <p><b>解：</b>$L=\tfrac12\|x\|^2+\lambda^{\mathsf T}(Ax-b)$，$\nabla_x L=x+A^{\mathsf T}\lambda=0\Rightarrow x=-A^{\mathsf T}\lambda$。代入 $Ax=b$：$\lambda=-(AA^{\mathsf T})^{-1}b$，故 $x^*=A^{\mathsf T}(AA^{\mathsf T})^{-1}b$。</p></div>
+  <div class="box ex"><span class="lb">练习 7.3 · 线性规划对偶</span>
+    <p><b>题：</b>$\min c^{\mathsf T}x$ s.t. $Ax=b,x\ge0$。</p>
+    <p><b>解：</b>$L=c^{\mathsf T}x+\lambda^{\mathsf T}(b-Ax)$，对 $x\ge0$ 取 inf：当 $c-A^{\mathsf T}\lambda\ge0$ 时 $d(\lambda)=b^{\mathsf T}\lambda$，否则 $-\infty$。对偶：$\max b^{\mathsf T}\lambda$ s.t. $A^{\mathsf T}\lambda\le c$。</p></div>
+  <div class="box ex"><span class="lb">练习 7.4 · 弱对偶给下界</span>
+    <p><b>题：</b>某对偶可行 $\mu$ 得 $d(\mu)=5$，能推出什么？</p>
+    <p><b>解：</b>由弱对偶 $d(\mu)\le p^*$，故原问题最优值 $p^*\ge5$——对偶任一可行点都给原问题一个<b>下界</b>，可用于估计/剪枝。</p></div>
+  <div class="box ex"><span class="lb">练习 7.5 · 对偶函数恒凹</span>
+    <p><b>题：</b>为何 $d(\lambda,\mu)=\inf_x L$ 总是凹的？</p>
+    <p><b>解：</b>$L$ 对 $(\lambda,\mu)$ <b>仿射</b>，而仿射族的<b>逐点下确界</b>是凹函数，与原问题是否凸无关。故对偶问题 $\max d$ 永远是凸优化。</p></div>
+</section>
+
+<!-- ================= 8 罚函数 ================= -->
+<section id="s8">
+  <h2><span class="n">8</span>罚函数法</h2>
+  <p class="lead">思路：把约束「化进」目标函数，转成无约束问题来解。</p>
+
+  <h3>外罚函数法</h3>
+  <p>在可行域<b>外</b>受罚，惩罚项随违反程度增大，$\sigma\to+\infty$：</p>
+  <div class="formula">$$P(x,\sigma)=f(x)+\sigma\Big[\sum_{i\in E}c_i(x)^2+\sum_{i\in I}\big(\max(0,c_i(x))\big)^2\Big].$$</div>
+  <ul><li>聚点为全局最优解，但 $\sigma$ 很大时 Hessian 条件数恶化，<b>有病态性</b>。</li></ul>
+  <div class="box ex">
+    <span class="lb">例题 · 外罚</span>
+    <p>$\min x_1^2+x_2^2$，s.t. $1-x_1\le0$。构造 $P=x_1^2+x_2^2+\sigma[\max(0,1-x_1)]^2$，解析求驻点得 $x_1(\sigma)=\tfrac{\sigma}{\sigma+1},\,x_2=0$，令 $\sigma\to\infty$ 得 $x^*=(1,0)^{\mathsf T}$。</p>
+  </div>
+
+  <h3>内罚函数法（障碍函数）</h3>
+  <p>在可行域<b>内</b>设障碍，逼近边界时趋于 $+\infty$，参数 $r\to0$。<b>只适用于不等式约束</b>，不能处理等式约束。</p>
+  <div class="formula">$$P(x,r)=f(x)-r\sum_{i}\ln(-c_i(x))\quad\text{或}\quad P(x,r)=f(x)-r\sum_i\frac{1}{c_i(x)}.$$</div>
+  <div class="box ex">
+    <span class="lb">例题 · 内罚</span>
+    <p>$\min x_1^2+2x_2^2$，s.t. $x_1+x_2-1\ge0$。构造 $P=x_1^2+2x_2^2-r\ln(x_1+x_2-1)$。</p>
+    <p>$\nabla_x P=\big(2x_1-\tfrac{r}{x_1+x_2-1},\,4x_2-\tfrac{r}{x_1+x_2-1}\big)=0$，解得 $x(r)=\big(\tfrac{1+\sqrt{1+3r}}{3},\tfrac{1+\sqrt{1+3r}}{6}\big)$，令 $r\to0$ 得 $x^*=(\tfrac23,\tfrac13)^{\mathsf T},\ f(x^*)=\tfrac23$。</p>
+  </div>
+
+  <h3>增广拉格朗日法（ALM）</h3>
+  <p>在 Lagrange 基础上加二次罚项，靠<b>更新乘子</b>让 $x$ 恰好成为无约束极小点，避免 $\sigma\to\infty$ 的病态。等式约束算法：</p>
+  <div class="formula">$$\min_x\ \phi(x,\lambda^k,\sigma_k)=f(x)+\sum_i\lambda_i^k h_i(x)+\frac{\sigma_k}{2}\sum_i h_i^2(x),$$</div>
+  <div class="formula">$$\text{乘子更新：}\quad \lambda_i^{k+1}=\lambda_i^k+\sigma_k h_i(x^k),\qquad \sigma_{k+1}=\rho\sigma_k.$$</div>
+  <div class="box ex">
+    <span class="lb">例题 · ALM</span>
+    <p>$\min 2x_1^2+x_2^2-2x_1x_2$，s.t. $h=x_1+x_2-1=0$。$\phi=2x_1^2+x_2^2-2x_1x_2+\lambda(x_1+x_2-1)+\tfrac{\sigma}{2}(x_1+x_2-1)^2$。</p>
+    <p>取 $\sigma_1=2,\lambda^1=-1$，解析求 $\min_x\phi(x,-1,2)$ 得 $x^1=(\tfrac12,\tfrac34)^{\mathsf T}$；更新 $\lambda^2=\lambda^1+\sigma_1 h(x^1)=-1+2\cdot\tfrac14=-\tfrac12$，$\sigma_2=4$，再求 $x^2$，如此迭代。</p>
+  </div>
+  <div class="box tip">
+    <span class="lb">参数选取经验</span>
+    <p>罚因子放大系数一般取 $\rho\in[2,10]$。太小收敛慢，太大病态严重。一般约束可引入松弛变量把不等式约束转成等式约束再套 ALM。</p>
+  </div>
+
+  <h3>📝 例题精练（5 道）</h3>
+  <div class="box ex"><span class="lb">练习 8.1 · 外罚函数</span>
+    <p><b>题：</b>$\min x_1^2+x_2^2$ s.t. $x_1\ge1$。</p>
+    <p><b>解：</b>$P=x_1^2+x_2^2+\sigma[\max(0,1-x_1)]^2$。可行域外 $x_1<1$：$\partial_{x_1}P=2x_1-2\sigma(1-x_1)=0\Rightarrow x_1=\tfrac{\sigma}{\sigma+1},x_2=0$。$\sigma\to\infty$ 得 $x^*=(1,0)$（需 $\sigma\to\infty$ ⟹ 病态）。</p></div>
+  <div class="box ex"><span class="lb">练习 8.2 · 内罚（障碍）函数</span>
+    <p><b>题：</b>$\min x_1^2+2x_2^2$ s.t. $x_1+x_2\ge1$。</p>
+    <p><b>解：</b>$P=x_1^2+2x_2^2-r\ln(x_1+x_2-1)$，$\nabla_x P=0$ 解 $x(r)$，$r\to0^+$ 得 $x^*=(\tfrac23,\tfrac13),f=\tfrac23$。路径始终在可行域<b>内部</b>，初值须严格可行。</p></div>
+  <div class="box ex"><span class="lb">练习 8.3 · 增广拉格朗日（乘子递推）</span>
+    <p><b>题：</b>$\min x^2+y^2$ s.t. $x+y=2$，$\sigma=1,\lambda_0=0$。</p>
+    <p><b>解：</b>$\min_x L_\sigma\Rightarrow x=y=\tfrac{2-\lambda}4$，$c=x+y-2=\tfrac{-2-\lambda}2$，递推 $\lambda_{k+1}=\tfrac{\lambda_k}2-1\to\lambda^*=-2$。代回 $x=y=1$，$f=2$（<b>有限 $\sigma$</b> 即得精确解）。</p></div>
+  <div class="box ex"><span class="lb">练习 8.4 · 罚因子过小 ⟹ 无下界</span>
+    <p><b>题：</b>$\min -x^2+2y^2$ s.t. $x=1$，二次罚 $P=-x^2+2y^2+\tfrac\sigma2(x-1)^2$。</p>
+    <p><b>解：</b>$x$ 方向二次项系数为 $-1+\tfrac\sigma2$，当 $\sigma\le2$ 时 $\le0$ ⟹ $P$ <b>无下界</b>（沿 $x\to\infty$ 趋于 $-\infty$）。故 $\sigma$ 须足够大。</p></div>
+  <div class="box ex"><span class="lb">练习 8.5 · ℓ₁ 精确罚</span>
+    <p><b>题：</b>为何 $\ell_1$ 精确罚用<b>有限</b>罚因子就能得到精确解？</p>
+    <p><b>解：</b>$P=f+\sigma\sum|c_i|$，只要 $\sigma>\|\lambda^*\|_\infty$（最优乘子范数），$P$ 的极小点就<b>恰好</b>是原约束问题的解。代价：$|c_i|$ 不可微（精确罚必非光滑）。</p></div>
+</section>
+
+<!-- ================= 9 速查 ================= -->
+<section id="s9">
+  <h2><span class="n">9</span>考前速查清单</h2>
+  <div class="box key">
+    <span class="lb">看到题先问自己</span>
+    <ul style="margin-bottom:2px">
+      <li><b>判断凸性？</b> → 求 Hessian，看半正定（顺序主子式 / 特征值）。</li>
+      <li><b>求无约束极小？</b> → $\nabla f=0$ 找平稳点 → 看 $\nabla^2 f$ 正定（充分）/ 半正定（再分析）。</li>
+      <li><b>给了二次型 + 矩阵？</b> → 先检查是否对称，不对称先对称化。</li>
+      <li><b>一维找极小？</b> → 黄金分割（$\rho=0.382$，4 步压到 0.3）或牛顿迭代。</li>
+      <li><b>算法迭代题？</b> → 二次型用显式步长公式；牛顿解 $\nabla^2f\,d=-\nabla f$；拟牛顿套 DFP/BFGS。</li>
+      <li><b>带约束求解？</b> → 验约束规范 → 写 KKT 四件套 → 凸规划即全局，否则二阶验证。</li>
+      <li><b>写对偶？</b> → $L$ 对 $x$ 求 min，乘子 $\mu\ge0$，对偶函数永远凹。</li>
+      <li><b>罚函数？</b> → 等式用外罚 / ALM；不等式可用内罚；ALM 靠更新乘子避免病态。</li>
+    </ul>
+  </div>
+  <div class="box warn">
+    <span class="lb">最容易丢分的点</span>
+    <ul style="margin-bottom:2px">
+      <li>二阶必要条件（半正定）当成充分条件用（$x^3$ 反例）。</li>
+      <li>KKT 求导时漏掉「只对有效约束求导」「不等式乘子 $\ge0$」「互补松弛」。</li>
+      <li>非对称矩阵不对称化就套二次型梯度公式。</li>
+      <li>内罚函数去处理等式约束（它只能处理不等式）。</li>
+      <li>忘了凸规划下 KKT 点直接是全局解，白白多做二阶验证。</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  最优化理论复习手册 · 内容整理自所给例题与课件总结 · 含 MathJax 公式渲染，可直接打印
+</footer>
+</main>
+</div>
+<script>
+  // 高亮当前章节
+  const links=[...document.querySelectorAll('nav.toc a')];
+  const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+  const obs=new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(l=>l.style.background='');
+      const a=map.get(e.target.id); if(a){a.style.background='var(--chip)';a.style.color='var(--primary)';}
+    }});
+  },{rootMargin:'-10% 0px -80% 0px'});
+  document.querySelectorAll('section[id]').forEach(s=>obs.observe(s));
+  // 移动端点目录后关闭
+  document.querySelectorAll('nav.toc a').forEach(a=>a.addEventListener('click',()=>{
+    if(window.innerWidth<=880) document.querySelector('nav.toc').classList.remove('open');
+  }));
+</script>
+</body>
+</html>
